@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Victron Configurator</title>
+
+<style>
+body{font-family:Arial;background:#f5f7fa;padding:20px}
+.card{background:white;padding:20px;border-radius:12px;margin-bottom:15px;box-shadow:0 2px 6px rgba(0,0,0,0.1)}
+input,select{width:100%;padding:10px;margin:5px 0;border-radius:8px;border:1px solid #ccc}
+button{background:#007aff;color:white;padding:12px;border:none;border-radius:10px;width:100%;margin-top:10px}
+.result{font-weight:bold;font-size:18px}
+</style>
+</head>
+
+<body>
+
+<h2>Victron Configurator</h2>
+
+<div class="card">
+
+<label>Tipo cliente</label>
+<select id="type">
+<option value="operatore">Operatore</option>
+<option value="privato">Privato</option>
+</select>
+
+<label>Costo prodotto (€)</label>
+<input id="cost" type="number" value="100">
+
+<label>Quantità</label>
+<input id="qty" type="number" value="1">
+
+<label>Ore progettazione</label>
+<input id="hours" type="number" value="2">
+
+<label>Costo orario (€)</label>
+<input id="hourCost" type="number" value="20">
+
+<label>Costo trasporto (€)</label>
+<input id="shipCost" type="number" value="10">
+
+<button onclick="calc()">Calcola</button>
+
+</div>
+
+<div class="card result" id="output"></div>
+
+<script>
+
+function calc(){
+
+let cost = parseFloat(document.getElementById('cost').value);
+let qty = parseInt(document.getElementById('qty').value);
+let type = document.getElementById('type').value;
+let hours = parseFloat(document.getElementById('hours').value);
+let hourCost = parseFloat(document.getElementById('hourCost').value);
+let shipCost = parseFloat(document.getElementById('shipCost').value);
+
+let publicPrice = cost / 0.375;
+let discount = type==="operatore"?0.5:0.4;
+let net = publicPrice * (1-discount);
+
+let productsTotal = net * qty;
+
+let designSell = productsTotal * 0.02;
+let designCost = hours * hourCost;
+
+let shipSell = productsTotal * 0.03;
+
+let total = productsTotal + designSell + shipSell;
+let vat = total * 0.22;
+
+let margin = (productsTotal - cost*qty) + (designSell-designCost) + (shipSell-shipCost);
+
+document.getElementById('output').innerHTML =
+"Totale netto: "+total.toFixed(2)+"€<br>"+
+"IVA: "+vat.toFixed(2)+"€<br>"+
+"Totale finale: "+(total+vat).toFixed(2)+"€<br><br>"+
+"Margine totale: "+margin.toFixed(2)+"€";
+
+}
+
+</script>
+
+</body>
+</html>
