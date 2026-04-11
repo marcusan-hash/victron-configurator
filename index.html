@@ -1,88 +1,825 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Victron Configurator</title>
-
-<style>
-body{font-family:Arial;background:#f5f7fa;padding:20px}
-.card{background:white;padding:20px;border-radius:12px;margin-bottom:15px;box-shadow:0 2px 6px rgba(0,0,0,0.1)}
-input,select{width:100%;padding:10px;margin:5px 0;border-radius:8px;border:1px solid #ccc}
-button{background:#007aff;color:white;padding:12px;border:none;border-radius:10px;width:100%;margin-top:10px}
-.result{font-weight:bold;font-size:18px}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Victron Configurator - Nautica</title>
+  <style>
+    :root{
+      --bg:#f3f5f8;
+      --card:#ffffff;
+      --text:#17202a;
+      --muted:#5f6b7a;
+      --line:#d8dee6;
+      --blue:#1976f3;
+      --blue-dark:#0f5fd0;
+      --ok:#0f9d58;
+      --warn:#d97706;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      padding:18px;
+    }
+    .wrap{
+      max-width:980px;
+      margin:0 auto;
+    }
+    h1{
+      margin:6px 0 6px;
+      font-size:34px;
+      line-height:1.1;
+    }
+    .subtitle{
+      color:var(--muted);
+      margin:0 0 18px;
+      font-size:15px;
+    }
+    .card{
+      background:var(--card);
+      border-radius:18px;
+      padding:18px;
+      margin-bottom:16px;
+      box-shadow:0 10px 24px rgba(18,36,64,.08);
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:14px;
+    }
+    @media(min-width:820px){
+      .grid-2{grid-template-columns:1fr 1fr;}
+      .grid-3{grid-template-columns:1fr 1fr 1fr;}
+    }
+    label{
+      display:block;
+      font-size:15px;
+      font-weight:600;
+      margin-bottom:6px;
+    }
+    input,select{
+      width:100%;
+      padding:14px 12px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      font-size:16px;
+      background:#fff;
+    }
+    .check-row{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 0;
+    }
+    .check-row input{
+      width:20px;
+      height:20px;
+      margin:0;
+    }
+    button{
+      border:none;
+      background:var(--blue);
+      color:#fff;
+      padding:14px 16px;
+      border-radius:14px;
+      font-size:16px;
+      font-weight:700;
+      width:100%;
+      cursor:pointer;
+    }
+    button.secondary{
+      background:#eef4ff;
+      color:var(--blue-dark);
+    }
+    button.ghost{
+      background:#eef1f4;
+      color:#213547;
+    }
+    .btns{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
+    }
+    @media(min-width:700px){
+      .btns{grid-template-columns:1fr 1fr 1fr;}
+    }
+    .section-title{
+      font-size:20px;
+      margin:0 0 12px;
+    }
+    .badge{
+      display:inline-block;
+      background:#eaf2ff;
+      color:var(--blue-dark);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      margin-bottom:10px;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:14px;
+    }
+    th,td{
+      text-align:left;
+      padding:10px 8px;
+      border-bottom:1px solid var(--line);
+      vertical-align:top;
+    }
+    th{
+      color:var(--muted);
+      font-weight:700;
+      font-size:13px;
+    }
+    .totals{
+      display:grid;
+      gap:8px;
+      margin-top:12px;
+    }
+    .total-row{
+      display:flex;
+      justify-content:space-between;
+      gap:20px;
+      font-size:15px;
+    }
+    .total-row strong{
+      font-size:18px;
+    }
+    .pill-ok,.pill-warn{
+      display:inline-block;
+      font-size:12px;
+      padding:4px 8px;
+      border-radius:999px;
+      font-weight:700;
+    }
+    .pill-ok{background:#e8f7ef;color:var(--ok)}
+    .pill-warn{background:#fff4e5;color:var(--warn)}
+    .small{
+      color:var(--muted);
+      font-size:13px;
+    }
+    .mono{
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      font-size:13px;
+    }
+    .empty{
+      color:var(--muted);
+      font-style:italic;
+      padding:8px 0;
+    }
+    .list{
+      margin:0;
+      padding-left:18px;
+    }
+  </style>
 </head>
-
 <body>
+<div class="wrap">
+  <h1>Victron Configurator</h1>
+  <p class="subtitle">Versione V1 - Nautica. Configurazione iniziale automatica, preventivo cliente e stampa interna.</p>
 
-<h2>Victron Configurator</h2>
+  <div class="card">
+    <div class="badge">Contesto: Nautica</div>
+    <h2 class="section-title">Dati progetto</h2>
 
-<div class="card">
+    <div class="grid grid-2">
+      <div>
+        <label for="projectName">Nome progetto</label>
+        <input id="projectName" value="Impianto nautico V1" />
+      </div>
+      <div>
+        <label for="customerType">Tipo cliente</label>
+        <select id="customerType">
+          <option value="operatore">Operatore</option>
+          <option value="privato">Privato</option>
+        </select>
+      </div>
+      <div>
+        <label for="systemVoltage">Tensione impianto</label>
+        <select id="systemVoltage">
+          <option value="12">12V</option>
+          <option value="24" selected>24V</option>
+          <option value="48">48V</option>
+        </select>
+      </div>
+      <div>
+        <label for="inverterPower">Potenza inverter richiesta (VA)</label>
+        <input id="inverterPower" type="number" value="3000" />
+      </div>
+      <div>
+        <label for="pvPower">Potenza FV totale (W)</label>
+        <input id="pvPower" type="number" value="800" />
+      </div>
+      <div>
+        <label for="batteryCapacity">Capacità batteria (Ah)</label>
+        <input id="batteryCapacity" type="number" value="400" />
+      </div>
+    </div>
 
-<label>Tipo cliente</label>
-<select id="type">
-<option value="operatore">Operatore</option>
-<option value="privato">Privato</option>
-</select>
+    <div class="grid grid-2" style="margin-top:10px;">
+      <div class="check-row"><input id="hasShore" type="checkbox" checked><label for="hasShore" style="margin:0;">Ingresso rete/banchina</label></div>
+      <div class="check-row"><input id="hasGenerator" type="checkbox"><label for="hasGenerator" style="margin:0;">Generatore AC</label></div>
+      <div class="check-row"><input id="hasAlternator" type="checkbox" checked><label for="hasAlternator" style="margin:0;">Alternatore / DC-DC</label></div>
+      <div class="check-row"><input id="remoteMonitoring" type="checkbox" checked><label for="remoteMonitoring" style="margin:0;">Monitoraggio remoto</label></div>
+      <div class="check-row"><input id="batteryMonitor" type="checkbox" checked><label for="batteryMonitor" style="margin:0;">Battery monitor / shunt</label></div>
+      <div class="check-row"><input id="advancedDc" type="checkbox" checked><label for="advancedDc" style="margin:0;">Distribuzione DC professionale</label></div>
+    </div>
 
-<label>Costo prodotto (€)</label>
-<input id="cost" type="number" value="100">
+    <div class="grid grid-3" style="margin-top:14px;">
+      <div>
+        <label for="designHours">Ore progettazione</label>
+        <input id="designHours" type="number" value="3" />
+      </div>
+      <div>
+        <label for="designHourlyCost">Costo orario interno (€)</label>
+        <input id="designHourlyCost" type="number" value="20" />
+      </div>
+      <div>
+        <label for="shippingInternalCost">Costo interno trasporto (€)</label>
+        <input id="shippingInternalCost" type="number" value="25" />
+      </div>
+    </div>
 
-<label>Quantità</label>
-<input id="qty" type="number" value="1">
+    <div class="btns" style="margin-top:16px;">
+      <button onclick="generateProject()">Genera configurazione</button>
+      <button class="secondary" onclick="saveProject()">Salva progetto</button>
+      <button class="ghost" onclick="loadProject()">Carica progetto</button>
+    </div>
+  </div>
 
-<label>Ore progettazione</label>
-<input id="hours" type="number" value="2">
+  <div class="card">
+    <h2 class="section-title">Configurazione automatica</h2>
+    <div id="configSummary" class="empty">Premi "Genera configurazione".</div>
+  </div>
 
-<label>Costo orario (€)</label>
-<input id="hourCost" type="number" value="20">
+  <div class="card">
+    <h2 class="section-title">Componenti selezionati</h2>
+    <div id="componentsTable" class="empty">Nessun componente ancora generato.</div>
+  </div>
 
-<label>Costo trasporto (€)</label>
-<input id="shipCost" type="number" value="10">
+  <div class="card">
+    <h2 class="section-title">Preventivo cliente</h2>
+    <div id="quoteTable" class="empty">Nessun preventivo ancora generato.</div>
+  </div>
 
-<button onclick="calc()">Calcola</button>
-
+  <div class="card">
+    <h2 class="section-title">Stampa interna</h2>
+    <div id="internalTable" class="empty">Nessuna stampa interna ancora generata.</div>
+  </div>
 </div>
 
-<div class="card result" id="output"></div>
-
 <script>
+const PRODUCT_CATALOG = [
+  {
+    id: "multiplus_ii_12_3000",
+    code: "MULTI-12-3000",
+    name: "MultiPlus-II 12/3000",
+    family: "inverter_charger",
+    voltages: [12],
+    powerVa: 3000,
+    supplierTiers: [{minQty:1,cost:860}]
+  },
+  {
+    id: "multiplus_ii_24_3000",
+    code: "MULTI-24-3000",
+    name: "MultiPlus-II 24/3000",
+    family: "inverter_charger",
+    voltages: [24],
+    powerVa: 3000,
+    supplierTiers: [{minQty:1,cost:890}]
+  },
+  {
+    id: "multiplus_ii_48_5000",
+    code: "MULTI-48-5000",
+    name: "MultiPlus-II 48/5000",
+    family: "inverter_charger",
+    voltages: [48],
+    powerVa: 5000,
+    supplierTiers: [{minQty:1,cost:1390}]
+  },
+  {
+    id: "quattro_24_5000",
+    code: "QUATTRO-24-5000",
+    name: "Quattro 24/5000",
+    family: "inverter_charger",
+    voltages: [24],
+    powerVa: 5000,
+    dualAc: true,
+    supplierTiers: [{minQty:1,cost:1620}]
+  },
+  {
+    id: "quattro_48_5000",
+    code: "QUATTRO-48-5000",
+    name: "Quattro 48/5000",
+    family: "inverter_charger",
+    voltages: [48],
+    powerVa: 5000,
+    dualAc: true,
+    supplierTiers: [{minQty:1,cost:1710}]
+  },
+  {
+    id: "smartsolar_100_30",
+    code: "MPPT-100-30",
+    name: "SmartSolar MPPT 100/30",
+    family: "mppt",
+    voltages: [12,24],
+    maxPv: 440,
+    supplierTiers: [{minQty:1,cost:180}]
+  },
+  {
+    id: "smartsolar_100_50",
+    code: "MPPT-100-50",
+    name: "SmartSolar MPPT 100/50",
+    family: "mppt",
+    voltages: [12,24],
+    maxPv: 700,
+    supplierTiers: [{minQty:1,cost:240}]
+  },
+  {
+    id: "smartsolar_150_35",
+    code: "MPPT-150-35",
+    name: "SmartSolar MPPT 150/35",
+    family: "mppt",
+    voltages: [12,24,48],
+    maxPv: 1000,
+    supplierTiers: [{minQty:1,cost:260}]
+  },
+  {
+    id: "smartsolar_150_70",
+    code: "MPPT-150-70",
+    name: "SmartSolar MPPT 150/70",
+    family: "mppt",
+    voltages: [12,24,48],
+    maxPv: 2000,
+    supplierTiers: [{minQty:1,cost:430}]
+  },
+  {
+    id: "cerbo_gx",
+    code: "CERBO-GX",
+    name: "Cerbo GX",
+    family: "monitoring",
+    voltages: [12,24,48],
+    supplierTiers: [{minQty:1,cost:265}]
+  },
+  {
+    id: "smartshunt_500",
+    code: "SMARTSHUNT-500",
+    name: "SmartShunt 500A",
+    family: "battery_monitor",
+    voltages: [12,24,48],
+    supplierTiers: [{minQty:1,cost:95}]
+  },
+  {
+    id: "orion_xs_12_12_50",
+    code: "ORION-XS-12-12-50",
+    name: "Orion XS 12/12-50A",
+    family: "dcdc",
+    voltages: [12],
+    supplierTiers: [{minQty:1,cost:330}]
+  },
+  {
+    id: "orion_xs_24_family",
+    code: "ORION-XS-24-FAMILY",
+    name: "Orion XS famiglia 24V",
+    family: "dcdc",
+    voltages: [24],
+    supplierTiers: [{minQty:1,cost:360}]
+  },
+  {
+    id: "lynx_distributor",
+    code: "LYNX-DISTRIBUTOR",
+    name: "Lynx Distributor",
+    family: "dc_distribution",
+    voltages: [12,24,48],
+    supplierTiers: [{minQty:1,cost:310}]
+  },
+  {
+    id: "battery_bank",
+    code: "BATTERY-BANK",
+    name: "Battery Bank",
+    family: "battery",
+    voltages: [12,24,48],
+    supplierTiers: [{minQty:1,cost:0}]
+  }
+];
 
-function calc(){
-
-let cost = parseFloat(document.getElementById('cost').value);
-let qty = parseInt(document.getElementById('qty').value);
-let type = document.getElementById('type').value;
-let hours = parseFloat(document.getElementById('hours').value);
-let hourCost = parseFloat(document.getElementById('hourCost').value);
-let shipCost = parseFloat(document.getElementById('shipCost').value);
-
-let publicPrice = cost / 0.375;
-let discount = type==="operatore"?0.5:0.4;
-let net = publicPrice * (1-discount);
-
-let productsTotal = net * qty;
-
-let designSell = productsTotal * 0.02;
-let designCost = hours * hourCost;
-
-let shipSell = productsTotal * 0.03;
-
-let total = productsTotal + designSell + shipSell;
-let vat = total * 0.22;
-
-let margin = (productsTotal - cost*qty) + (designSell-designCost) + (shipSell-shipCost);
-
-document.getElementById('output').innerHTML =
-"Totale netto: "+total.toFixed(2)+"€<br>"+
-"IVA: "+vat.toFixed(2)+"€<br>"+
-"Totale finale: "+(total+vat).toFixed(2)+"€<br><br>"+
-"Margine totale: "+margin.toFixed(2)+"€";
-
+function euro(v){
+  return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(v || 0);
 }
 
-</script>
+function getFormData(){
+  return {
+    projectName: document.getElementById('projectName').value.trim(),
+    customerType: document.getElementById('customerType').value,
+    systemVoltage: Number(document.getElementById('systemVoltage').value),
+    inverterPower: Number(document.getElementById('inverterPower').value || 0),
+    pvPower: Number(document.getElementById('pvPower').value || 0),
+    batteryCapacity: Number(document.getElementById('batteryCapacity').value || 0),
+    hasShore: document.getElementById('hasShore').checked,
+    hasGenerator: document.getElementById('hasGenerator').checked,
+    hasAlternator: document.getElementById('hasAlternator').checked,
+    remoteMonitoring: document.getElementById('remoteMonitoring').checked,
+    batteryMonitor: document.getElementById('batteryMonitor').checked,
+    advancedDc: document.getElementById('advancedDc').checked,
+    designHours: Number(document.getElementById('designHours').value || 0),
+    designHourlyCost: Number(document.getElementById('designHourlyCost').value || 0),
+    shippingInternalCost: Number(document.getElementById('shippingInternalCost').value || 0)
+  };
+}
 
+function findInverter(input){
+  const candidates = PRODUCT_CATALOG.filter(p =>
+    p.family === 'inverter_charger' &&
+    p.voltages.includes(input.systemVoltage)
+  );
+
+  if (input.hasShore && input.hasGenerator) {
+    const dual = candidates.filter(c => c.dualAc);
+    const bestDual = dual.find(c => c.powerVa >= input.inverterPower);
+    if (bestDual) return bestDual;
+  }
+
+  return candidates.find(c => c.powerVa >= input.inverterPower) || candidates[candidates.length - 1] || null;
+}
+
+function findMppt(input){
+  if (input.pvPower <= 0) return null;
+  const candidates = PRODUCT_CATALOG.filter(p =>
+    p.family === 'mppt' &&
+    p.voltages.includes(input.systemVoltage)
+  ).sort((a,b)=>(a.maxPv||0)-(b.maxPv||0));
+
+  return candidates.find(c => (c.maxPv || 0) >= input.pvPower) || candidates[candidates.length - 1] || null;
+}
+
+function findDcDc(input){
+  if (!input.hasAlternator) return null;
+  const candidates = PRODUCT_CATALOG.filter(p =>
+    p.family === 'dcdc' &&
+    p.voltages.includes(input.systemVoltage)
+  );
+  return candidates[0] || null;
+}
+
+function getTierCost(product, qty){
+  const tiers = [...(product.supplierTiers || [])].sort((a,b)=>b.minQty-a.minQty);
+  const tier = tiers.find(t => qty >= t.minQty) || tiers[tiers.length - 1];
+  return tier ? tier.cost : 0;
+}
+
+function publicListFromCost(cost){
+  return cost / 0.375;
+}
+
+function discountRate(customerType){
+  return customerType === 'operatore' ? 0.50 : 0.40;
+}
+
+function buildAutoConfig(input){
+  const selected = [];
+  const notes = [];
+
+  selected.push({
+    ...PRODUCT_CATALOG.find(p => p.id === 'battery_bank'),
+    qty: 1,
+    role: `Banco batterie ${input.systemVoltage}V ${input.batteryCapacity}Ah`
+  });
+
+  const inverter = findInverter(input);
+  if (inverter) {
+    selected.push({...inverter, qty: 1, role: 'Inverter / Charger principale'});
+    if (inverter.dualAc) {
+      notes.push('Scelto Quattro per doppio ingresso AC (rete + generatore).');
+    }
+  } else {
+    notes.push('Nessun inverter compatibile trovato nella libreria iniziale.');
+  }
+
+  const mppt = findMppt(input);
+  if (mppt) {
+    selected.push({...mppt, qty: 1, role: 'Regolatore fotovoltaico'});
+  }
+
+  if (input.remoteMonitoring) {
+    const cerbo = PRODUCT_CATALOG.find(p => p.id === 'cerbo_gx');
+    selected.push({...cerbo, qty: 1, role: 'Monitoraggio remoto'});
+    notes.push('Cerbo GX aggiunto per supervisione impianto.');
+  }
+
+  if (input.batteryMonitor) {
+    const shunt = PRODUCT_CATALOG.find(p => p.id === 'smartshunt_500');
+    selected.push({...shunt, qty: 1, role: 'Battery monitor'});
+  }
+
+  const dcdc = findDcDc(input);
+  if (dcdc) {
+    selected.push({...dcdc, qty: 1, role: 'Ricarica da alternatore'});
+  }
+
+  if (input.advancedDc) {
+    const lynx = PRODUCT_CATALOG.find(p => p.id === 'lynx_distributor');
+    selected.push({...lynx, qty: 1, role: 'Distribuzione DC'});
+  }
+
+  const warnings = [];
+  if (input.systemVoltage === 12 && input.inverterPower > 3000) {
+    warnings.push('Attenzione: 12V con potenze elevate può richiedere verifica accurata di correnti e cablaggi.');
+  }
+  if (input.remoteMonitoring && input.batteryMonitor && mppt && dcdc) {
+    warnings.push('Verificare numero porte dati disponibili sul nodo di monitoraggio.');
+  }
+  if (input.hasGenerator && !input.hasShore) {
+    notes.push('Ingresso AC previsto da generatore soltanto.');
+  }
+
+  return { selected, notes, warnings };
+}
+
+function buildQuoteRows(selected, customerType){
+  const discount = discountRate(customerType);
+  return selected.map(item => {
+    const supplierCostUnit = getTierCost(item, item.qty);
+    const publicListUnit = publicListFromCost(supplierCostUnit);
+    const netUnitPrice = publicListUnit * (1 - discount);
+    const lineNetTotal = netUnitPrice * item.qty;
+
+    return {
+      code: item.code,
+      description: item.name,
+      qty: item.qty,
+      role: item.role || '',
+      supplierCostUnit,
+      supplierCostTotal: supplierCostUnit * item.qty,
+      publicListUnit,
+      discountRate: discount,
+      netUnitPrice,
+      lineNetTotal,
+      marginValue: lineNetTotal - (supplierCostUnit * item.qty),
+      marginPercent: lineNetTotal > 0 ? ((lineNetTotal - (supplierCostUnit * item.qty)) / lineNetTotal) : 0
+    };
+  });
+}
+
+function renderConfigSummary(input, config){
+  const html = `
+    <div class="small">Progetto: <strong>${input.projectName || 'Nautica'}</strong></div>
+    <div class="small">Sistema: <strong>${input.systemVoltage}V</strong> · Cliente: <strong>${input.customerType}</strong> · Inverter richiesto: <strong>${input.inverterPower} VA</strong> · FV: <strong>${input.pvPower} W</strong></div>
+    <div style="margin-top:10px;">
+      ${config.warnings.length ? `<span class="pill-warn">${config.warnings.length} warning</span>` : `<span class="pill-ok">Configurazione base generata</span>`}
+    </div>
+    <div style="margin-top:12px;">
+      <strong>Note automatiche</strong>
+      ${config.notes.length ? `<ul class="list">${config.notes.map(n => `<li>${n}</li>`).join('')}</ul>` : `<div class="empty">Nessuna nota specifica.</div>`}
+    </div>
+    <div style="margin-top:12px;">
+      <strong>Warning</strong>
+      ${config.warnings.length ? `<ul class="list">${config.warnings.map(w => `<li>${w}</li>`).join('')}</ul>` : `<div class="empty">Nessun warning critico nella configurazione base.</div>`}
+    </div>
+  `;
+  document.getElementById('configSummary').innerHTML = html;
+}
+
+function renderComponents(selected){
+  if (!selected.length) {
+    document.getElementById('componentsTable').innerHTML = `<div class="empty">Nessun componente selezionato.</div>`;
+    return;
+  }
+
+  const rows = selected.map(item => `
+    <tr>
+      <td class="mono">${item.code}</td>
+      <td>${item.name}<div class="small">${item.role || ''}</div></td>
+      <td>${item.qty}</td>
+    </tr>
+  `).join('');
+
+  document.getElementById('componentsTable').innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Codice</th>
+          <th>Descrizione</th>
+          <th>Q.tà</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+function renderQuote(quoteRows, input){
+  const productsSubtotal = quoteRows.reduce((s,r)=>s+r.lineNetTotal,0);
+
+  const designSell = productsSubtotal * 0.02;
+  const shippingSell = productsSubtotal * 0.03;
+  const taxable = productsSubtotal + designSell + shippingSell;
+  const vat = taxable * 0.22;
+  const total = taxable + vat;
+
+  const rows = quoteRows.map(r => `
+    <tr>
+      <td class="mono">${r.code}</td>
+      <td>${r.description}</td>
+      <td>${r.qty}</td>
+      <td>${euro(r.publicListUnit)}</td>
+      <td>${(r.discountRate * 100).toFixed(0)}%</td>
+      <td>${euro(r.netUnitPrice)}</td>
+      <td>${euro(r.lineNetTotal)}</td>
+    </tr>
+  `).join('');
+
+  document.getElementById('quoteTable').innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Codice</th>
+          <th>Descrizione</th>
+          <th>Q.tà</th>
+          <th>Listino pubblico</th>
+          <th>Sconto</th>
+          <th>Netto unit.</th>
+          <th>Totale netto</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+        <tr>
+          <td>SERV-DESIGN</td>
+          <td>Progettazione</td>
+          <td>1</td>
+          <td>—</td>
+          <td>—</td>
+          <td>${euro(designSell)}</td>
+          <td>${euro(designSell)}</td>
+        </tr>
+        <tr>
+          <td>SERV-SHIP</td>
+          <td>Trasporto</td>
+          <td>1</td>
+          <td>—</td>
+          <td>—</td>
+          <td>${euro(shippingSell)}</td>
+          <td>${euro(shippingSell)}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="totals">
+      <div class="total-row"><span>Subtotale prodotti</span><span>${euro(productsSubtotal)}</span></div>
+      <div class="total-row"><span>Progettazione</span><span>${euro(designSell)}</span></div>
+      <div class="total-row"><span>Trasporto</span><span>${euro(shippingSell)}</span></div>
+      <div class="total-row"><span>Imponibile</span><span>${euro(taxable)}</span></div>
+      <div class="total-row"><span>IVA 22%</span><span>${euro(vat)}</span></div>
+      <div class="total-row"><strong>Totale finale</strong><strong>${euro(total)}</strong></div>
+    </div>
+  `;
+}
+
+function renderInternal(quoteRows, input){
+  const productsSalesNetTotal = quoteRows.reduce((s,r)=>s+r.lineNetTotal,0);
+  const productsSupplierTotal = quoteRows.reduce((s,r)=>s+r.supplierCostTotal,0);
+
+  const designSell = productsSalesNetTotal * 0.02;
+  const designInternalCost = input.designHours * input.designHourlyCost;
+  const designMarginValue = designSell - designInternalCost;
+  const designMarginPercent = designSell > 0 ? designMarginValue / designSell : 0;
+
+  const shippingSell = productsSalesNetTotal * 0.03;
+  const shippingInternalCost = input.shippingInternalCost;
+  const shippingMarginValue = shippingSell - shippingInternalCost;
+  const shippingMarginPercent = shippingSell > 0 ? shippingMarginValue / shippingSell : 0;
+
+  const projectSales = productsSalesNetTotal + designSell + shippingSell;
+  const projectCosts = productsSupplierTotal + designInternalCost + shippingInternalCost;
+  const projectMargin = projectSales - projectCosts;
+  const projectMarginPercent = projectSales > 0 ? projectMargin / projectSales : 0;
+
+  const rows = quoteRows.map(r => `
+    <tr>
+      <td class="mono">${r.code}</td>
+      <td>${r.description}</td>
+      <td>${r.qty}</td>
+      <td>${euro(r.supplierCostUnit)}</td>
+      <td>${euro(r.supplierCostTotal)}</td>
+      <td>${euro(r.netUnitPrice)}</td>
+      <td>${euro(r.lineNetTotal)}</td>
+      <td>${euro(r.marginValue)}</td>
+      <td>${(r.marginPercent * 100).toFixed(1)}%</td>
+    </tr>
+  `).join('');
+
+  document.getElementById('internalTable').innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Codice</th>
+          <th>Descrizione</th>
+          <th>Q.tà</th>
+          <th>Costo unit.</th>
+          <th>Costo tot.</th>
+          <th>Netto unit.</th>
+          <th>Netto tot.</th>
+          <th>Margine €</th>
+          <th>Margine %</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+
+    <div style="margin-top:18px;">
+      <strong>Servizi</strong>
+      <table style="margin-top:8px;">
+        <thead>
+          <tr>
+            <th>Voce</th>
+            <th>Vendita</th>
+            <th>Costo interno</th>
+            <th>Margine €</th>
+            <th>Margine %</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Progettazione<div class="small">${input.designHours} h × ${euro(input.designHourlyCost)}</div></td>
+            <td>${euro(designSell)}</td>
+            <td>${euro(designInternalCost)}</td>
+            <td>${euro(designMarginValue)}</td>
+            <td>${(designMarginPercent * 100).toFixed(1)}%</td>
+          </tr>
+          <tr>
+            <td>Trasporto</td>
+            <td>${euro(shippingSell)}</td>
+            <td>${euro(shippingInternalCost)}</td>
+            <td>${euro(shippingMarginValue)}</td>
+            <td>${(shippingMarginPercent * 100).toFixed(1)}%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="totals">
+      <div class="total-row"><span>Vendita netta totale progetto</span><span>${euro(projectSales)}</span></div>
+      <div class="total-row"><span>Costo interno totale progetto</span><span>${euro(projectCosts)}</span></div>
+      <div class="total-row"><strong>Margine totale €</strong><strong>${euro(projectMargin)}</strong></div>
+      <div class="total-row"><strong>Margine totale %</strong><strong>${(projectMarginPercent * 100).toFixed(1)}%</strong></div>
+    </div>
+  `;
+}
+
+function generateProject(){
+  const input = getFormData();
+  const config = buildAutoConfig(input);
+  const quoteRows = buildQuoteRows(config.selected, input.customerType);
+
+  renderConfigSummary(input, config);
+  renderComponents(config.selected);
+  renderQuote(quoteRows, input);
+  renderInternal(quoteRows, input);
+
+  const payload = { input, config };
+  localStorage.setItem('victron_nautica_project', JSON.stringify(payload));
+}
+
+function saveProject(){
+  generateProject();
+  alert('Progetto salvato nel browser.');
+}
+
+function loadProject(){
+  const raw = localStorage.getItem('victron_nautica_project');
+  if (!raw) {
+    alert('Nessun progetto salvato.');
+    return;
+  }
+  const { input } = JSON.parse(raw);
+
+  document.getElementById('projectName').value = input.projectName || '';
+  document.getElementById('customerType').value = input.customerType;
+  document.getElementById('systemVoltage').value = String(input.systemVoltage);
+  document.getElementById('inverterPower').value = input.inverterPower;
+  document.getElementById('pvPower').value = input.pvPower;
+  document.getElementById('batteryCapacity').value = input.batteryCapacity;
+  document.getElementById('hasShore').checked = input.hasShore;
+  document.getElementById('hasGenerator').checked = input.hasGenerator;
+  document.getElementById('hasAlternator').checked = input.hasAlternator;
+  document.getElementById('remoteMonitoring').checked = input.remoteMonitoring;
+  document.getElementById('batteryMonitor').checked = input.batteryMonitor;
+  document.getElementById('advancedDc').checked = input.advancedDc;
+  document.getElementById('designHours').value = input.designHours;
+  document.getElementById('designHourlyCost').value = input.designHourlyCost;
+  document.getElementById('shippingInternalCost').value = input.shippingInternalCost;
+
+  generateProject();
+}
+
+window.onload = () => {
+  const raw = localStorage.getItem('victron_nautica_project');
+  if (raw) loadProject();
+};
+</script>
 </body>
 </html>
