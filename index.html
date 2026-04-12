@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Victron Configurator Nautica V3.3 PRO</title>
+  <title>Victron Configurator Nautica V4</title>
   <style>
     :root{
       --bg:#eef2f7;
@@ -64,7 +64,7 @@
       font-size:16px;
       background:#fff;
     }
-    input[readonly]{
+    input[readonly], input:disabled, select:disabled{
       background:#f5f7fa;
       color:#556370;
     }
@@ -144,7 +144,7 @@
     }
     table{
       width:100%;
-      min-width:1080px;
+      min-width:1120px;
       border-collapse:collapse;
       font-size:14px;
     }
@@ -202,7 +202,7 @@
 <body>
 <div class="wrap">
   <h1>Victron Configurator</h1>
-  <p class="subtitle">V3.3 PRO · Nautica · Logica severa · Struttura V3.2 mantenuta · Preventivo e stampa interna completi.</p>
+  <p class="subtitle">V4 Nautica · Motore decisionale più rigoroso · Preventivo e stampa interna completi · Pronto per evoluzione a schema tecnico in V5.</p>
 
   <div class="card">
     <div class="badge">Contesto: Nautica</div>
@@ -210,7 +210,7 @@
     <div class="grid grid-4">
       <div>
         <label for="projectName">Nome progetto</label>
-        <input id="projectName" value="Impianto nautico V3.3 PRO" />
+        <input id="projectName" value="Impianto nautico V4" />
       </div>
       <div>
         <label for="customerType">Tipo cliente</label>
@@ -423,8 +423,8 @@ const PRODUCT_CATALOG = [
   {id:"blue_smart_ip22_12_30", code:"BPC123044002", name:"Blue Smart IP22 12V 30A", family:"charger", chargerSeries:"ip22", voltages:[12], maxChargeA:30, supplierTiers:[{minQty:1,cost:185}]},
   {id:"blue_smart_ip22_24_30", code:"BPC243044002", name:"Blue Smart IP22 24V 30A", family:"charger", chargerSeries:"ip22", voltages:[24], maxChargeA:30, supplierTiers:[{minQty:1,cost:195}]},
   {id:"blue_smart_ip65_12_25", code:"BPC122531064", name:"Blue Smart IP65 12V 25A", family:"charger", chargerSeries:"ip65", voltages:[12], maxChargeA:25, supplierTiers:[{minQty:1,cost:225}]},
-  {id:"smart_ip43_24_25", code:"PSC242553085", name:"Smart IP43 24V 25A", family:"charger", chargerSeries:"ip43", voltages:[24], maxChargeA:25, supplierTiers:[{minQty:1,cost:315}]},
   {id:"smart_ip43_12_30", code:"PSC123053085", name:"Smart IP43 12V 30A", family:"charger", chargerSeries:"ip43", voltages:[12], maxChargeA:30, supplierTiers:[{minQty:1,cost:305}]},
+  {id:"smart_ip43_24_25", code:"PSC242553085", name:"Smart IP43 24V 25A", family:"charger", chargerSeries:"ip43", voltages:[24], maxChargeA:25, supplierTiers:[{minQty:1,cost:315}]},
   {id:"centaur_24_30", code:"CCH024030000", name:"Centaur 24V 30A", family:"charger", chargerSeries:"centaur", voltages:[24], maxChargeA:30, supplierTiers:[{minQty:1,cost:420}]},
   {id:"skylla_ip44_24_80", code:"SKY024080000", name:"Skylla-IP44 24V 80A", family:"charger", chargerSeries:"skylla", voltages:[24], maxChargeA:80, supplierTiers:[{minQty:1,cost:980}]},
 
@@ -497,17 +497,17 @@ function onBankOriginChange(id){
 function onBatteryModelChange(id){
   const origin = getVal(`bb_origin_${id}`, 'existing');
   const productId = getVal(`bb_victron_${id}`, '');
+  const product = PRODUCT_CATALOG.find(p => p.id === productId);
   const singleV = document.getElementById(`bb_singlev_${id}`);
   const singleAh = document.getElementById(`bb_singleah_${id}`);
   const chemistry = document.getElementById(`bb_chem_${id}`);
-  const product = PRODUCT_CATALOG.find(p => p.id === productId);
 
   if (origin === 'new_victron' && product) {
     singleV.value = String(product.singleVoltage);
     singleAh.value = String(product.singleAh);
+    chemistry.value = product.chem;
     singleV.disabled = true;
     singleAh.readOnly = true;
-    chemistry.value = product.chem;
     chemistry.disabled = true;
   } else {
     singleV.disabled = false;
@@ -554,8 +554,7 @@ function resetBatteryBanks(){
     batteriesCount:1,
     seriesCount:1,
     parallelCount:1,
-    name:'Banco servizi esistente',
-    existingNoQuote:true
+    name:'Banco servizi esistente'
   });
   addBatteryBank({
     origin:'existing',
@@ -567,15 +566,12 @@ function resetBatteryBanks(){
     batteriesCount:1,
     seriesCount:1,
     parallelCount:1,
-    name:'Banco avviamento esistente',
-    existingNoQuote:true
+    name:'Banco avviamento esistente'
   });
 }
 function renderBatteryBanks(seedData = {}){
   const c = document.getElementById('batteryBanks');
-  const options = getBatteryProductOptions()
-    .map(p => `<option value="${p.id}">${p.name}</option>`)
-    .join('');
+  const products = getBatteryProductOptions();
 
   c.innerHTML = batteryBankIds.map((id, idx) => {
     const d = (seedData.id === id ? seedData : {});
@@ -626,7 +622,7 @@ function renderBatteryBanks(seedData = {}){
             <label>Modello batteria Victron</label>
             <select id="bb_victron_${id}" onchange="onBatteryModelChange('${id}')">
               <option value="">Nessuno</option>
-              ${options.replace(`value="${d.victronBatteryId || ''}"`, `value="${d.victronBatteryId || ''}" selected`)}
+              ${products.map(p => `<option value="${p.id}" ${d.victronBatteryId===p.id?'selected':''}>${p.name}</option>`).join('')}
             </select>
           </div>
 
@@ -929,22 +925,19 @@ function classifySystem(input){
 }
 
 function pickPhoenix(input){
-  const list = PRODUCT_CATALOG
-    .filter(p => p.family === 'inverter_only' && p.series === 'phoenix' && p.voltages.includes(input.systemVoltage))
+  const list = PRODUCT_CATALOG.filter(p => p.family === 'inverter_only' && p.series === 'phoenix' && p.voltages.includes(input.systemVoltage))
     .sort((a,b)=>(a.powerVa||0)-(b.powerVa||0));
   return list.find(p => (p.powerVa||0) >= input.inverterPower) || list[list.length - 1] || null;
 }
 
 function pickMultiPlus(input){
-  const list = PRODUCT_CATALOG
-    .filter(p => p.family === 'inverter_charger' && p.series === 'multiplus_ii' && p.voltages.includes(input.systemVoltage))
+  const list = PRODUCT_CATALOG.filter(p => p.family === 'inverter_charger' && p.series === 'multiplus_ii' && p.voltages.includes(input.systemVoltage))
     .sort((a,b)=>(a.powerVa||0)-(b.powerVa||0));
   return list.find(p => (p.powerVa||0) >= input.inverterPower) || list[list.length - 1] || null;
 }
 
 function pickQuattro(input){
-  const list = PRODUCT_CATALOG
-    .filter(p => p.family === 'inverter_charger' && p.series === 'quattro' && p.voltages.includes(input.systemVoltage))
+  const list = PRODUCT_CATALOG.filter(p => p.family === 'inverter_charger' && p.series === 'quattro' && p.voltages.includes(input.systemVoltage))
     .sort((a,b)=>(a.powerVa||0)-(b.powerVa||0));
   return list.find(p => (p.powerVa||0) >= input.inverterPower) || list[list.length - 1] || null;
 }
@@ -1154,8 +1147,7 @@ function pickDcLoadsHardware(input, notes){
 
 function pickMppts(input, notes){
   if (input.pvPower <= 0) return [];
-  const c = PRODUCT_CATALOG
-    .filter(p => p.family === 'mppt' && p.voltages.includes(input.systemVoltage))
+  const c = PRODUCT_CATALOG.filter(p => p.family === 'mppt' && p.voltages.includes(input.systemVoltage))
     .sort((a,b)=>(a.maxPv||0)-(b.maxPv||0));
   const one = c.find(x => (x.maxPv||0) >= input.pvPower);
   if (one) {
@@ -1205,14 +1197,26 @@ function pickMonitoring(input, selected, notes, warnings){
 
 function evaluateSystemWarnings(input, notes, warnings){
   const s = summarizeBanks(input);
-  if (!s.serviceBanks.length) warnings.push('Non è presente alcun banco servizi: impossibile definire correttamente l’architettura inverter.');
-  if (input.inverterPower > 0 && s.totalServiceWh > 0) {
-    const estimatedRuntimeHours = s.totalServiceWh / input.inverterPower;
-    if (estimatedRuntimeHours < 0.5) warnings.push('Autonomia teorica molto bassa rispetto alla potenza richiesta da inverter.');
-    if (input.inverterPower > s.totalServiceWh * 0.6) warnings.push('Banco servizi molto piccolo rispetto alla potenza richiesta: rischio di forti correnti e scarsa autonomia.');
+
+  if (!s.serviceBanks.length) {
+    warnings.push('Non è presente alcun banco servizi: impossibile definire correttamente l’architettura inverter.');
+    return;
   }
-  if (input.inverterPower >= 5000 && s.totalServiceAh <= 150) warnings.push('Richiesta da 5000W/VA con banco servizi ridotto: configurazione da rivedere con attenzione.');
-  if (!input.hasShore && !input.generators.length && input.inverterPower > 0) addNote(notes, 'Impianto senza sorgenti AC esterne: l’inverter fornisce AC ma non è prevista ricarica da banchina/generatore.');
+
+  if (input.inverterPower > 0 && s.totalServiceWh > 0) {
+    const runtime = s.totalServiceWh / input.inverterPower;
+    if (runtime < 0.5) warnings.push('Autonomia teorica molto bassa rispetto alla potenza richiesta da inverter.');
+    if (runtime < 1) warnings.push('Banco servizi probabilmente ridotto per la potenza richiesta: verificare uso reale, tempo di utilizzo e correnti.');
+  }
+
+  const peakLimit = input.systemVoltage * s.totalServiceAh;
+  if (input.inverterPower >= 5000 && peakLimit <= 4000) {
+    warnings.push('Richiesta inverter da 5000W/VA o superiore con banco batterie probabilmente insufficiente: configurazione da rivedere.');
+  }
+
+  if (!input.hasShore && !input.generators.length && input.inverterPower > 0) {
+    addNote(notes, 'Impianto senza sorgenti AC esterne: l’inverter fornisce AC ma non è prevista ricarica da banchina/generatore.');
+  }
 }
 
 function buildAutoConfig(input){
@@ -1222,7 +1226,6 @@ function buildAutoConfig(input){
   const checks = [];
 
   evaluateSystemWarnings(input, notes, warnings);
-
   pickBatteryProducts(input, notes, warnings).forEach(i => selected.push(i));
 
   const inverter = selectInverterArchitecture(input, notes, warnings);
@@ -1524,19 +1527,19 @@ function renderInternal(quoteRows, input){
 
 function saveProject(){
   const input = getFormData();
-  localStorage.setItem('victron_nautica_v33pro_project', JSON.stringify({input}));
-  alert('Progetto V3.3 PRO salvato nel browser.');
+  localStorage.setItem('victron_nautica_v4_project', JSON.stringify({input}));
+  alert('Progetto V4 salvato nel browser.');
 }
 
 function clearProject(){
-  localStorage.removeItem('victron_nautica_v33pro_project');
+  localStorage.removeItem('victron_nautica_v4_project');
   alert('Salvataggio cancellato.');
 }
 
 function loadProject(){
-  const raw = localStorage.getItem('victron_nautica_v33pro_project');
+  const raw = localStorage.getItem('victron_nautica_v4_project');
   if (!raw) {
-    alert('Nessun progetto V3.3 PRO salvato.');
+    alert('Nessun progetto V4 salvato.');
     return;
   }
   const { input } = JSON.parse(raw);
@@ -1595,7 +1598,7 @@ function generateProject(){
   renderQuote(quoteRows);
   renderInternal(quoteRows, input);
 
-  localStorage.setItem('victron_nautica_v33pro_project', JSON.stringify({input}));
+  localStorage.setItem('victron_nautica_v4_project', JSON.stringify({input}));
 }
 
 window.onload = () => {
@@ -1604,7 +1607,7 @@ window.onload = () => {
   resetAlternators();
   resetDcLoads();
 
-  const raw = localStorage.getItem('victron_nautica_v33pro_project');
+  const raw = localStorage.getItem('victron_nautica_v4_project');
   if (raw) loadProject();
 };
 </script>
