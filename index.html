@@ -3,200 +3,150 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Victron Configurator V3</title>
+<title>Victron Configurator V3 CORE</title>
 
 <style>
 body {
-  font-family: -apple-system, Arial;
+  font-family:-apple-system;
   background:#eef2f7;
   margin:0;
   padding:20px;
 }
-.container {
-  max-width:900px;
-  margin:auto;
-}
+.container {max-width:900px;margin:auto;}
 .card {
   background:white;
   padding:20px;
   margin-bottom:15px;
   border-radius:14px;
 }
-h1 {margin-bottom:10px;}
-h3 {margin-bottom:10px;}
-
-input, select {
+input,select {
   width:100%;
   padding:10px;
   margin-bottom:10px;
   border-radius:10px;
-  border:1px solid #ccc;
 }
-
 button {
   padding:12px;
-  border:none;
-  border-radius:10px;
   background:#1976f3;
   color:white;
-  width:100%;
-  font-weight:bold;
+  border:none;
+  border-radius:10px;
 }
-
-.row {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-.table {
-  width:100%;
-  border-collapse:collapse;
-}
-
-.table td {
-  padding:6px;
-  border-bottom:1px solid #eee;
-}
+.row {display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 </style>
 </head>
 
 <body>
-
 <div class="container">
 
 <h1>Victron Configurator V3</h1>
 
 <div class="card">
-<h3>Dati impianto</h3>
-
-<label>Tensione sistema</label>
-<select id="voltage">
+<h3>Impianto</h3>
+<select id="systemV">
 <option>12</option>
 <option selected>24</option>
 <option>48</option>
 </select>
 
-<label>Potenza richiesta inverter (VA)</label>
-<input id="power" value="8000">
+<input id="power" value="8000" placeholder="VA richiesti">
 </div>
 
 <div class="card">
-<h3>Banchi batteria</h3>
+<h3>Batterie</h3>
 <div id="banks"></div>
-<button onclick="addBank()">+ Aggiungi banco</button>
+<button onclick="addBank()">+ Banco</button>
 </div>
 
 <div class="card">
 <h3>Utenze DC</h3>
 <div id="loads"></div>
-<button onclick="addLoad()">+ Aggiungi utenza</button>
+<button onclick="addLoad()">+ Utenza</button>
 </div>
 
 <div class="card">
-<button onclick="calculate()">GENERA CONFIGURATORE</button>
+<button onclick="run()">GENERA</button>
 </div>
 
 <div class="card">
-<h3>Risultato tecnico</h3>
-<div id="tech"></div>
-</div>
-
-<div class="card">
-<h3>Preventivo</h3>
-<div id="quote"></div>
+<h3>Risultato</h3>
+<div id="out"></div>
 </div>
 
 </div>
 
 <script>
 
-let banks = [];
-let loads = [];
+let banks=[],loads=[];
 
-function addBank() {
-  let id = Date.now();
-  banks.push(id);
-
-  let html = `
-  <div id="b_${id}">
-    <hr>
-    <input id="b_name_${id}" placeholder="Nome banco">
-    <div class="row">
-      <input id="b_volt_${id}" placeholder="Volt singola" value="12">
-      <input id="b_ah_${id}" placeholder="Ah" value="100">
-    </div>
-    <div class="row">
-      <input id="b_series_${id}" placeholder="Serie" value="2">
-      <input id="b_parallel_${id}" placeholder="Parallelo" value="2">
-    </div>
-  </div>`;
-  
-  document.getElementById("banks").innerHTML += html;
+function addBank(){
+ let id=Date.now();
+ banks.push(id);
+ document.getElementById("banks").innerHTML+=`
+ <div id="b_${id}">
+ <hr>
+ <input id="type_${id}" placeholder="Tipo (esistente/nuovo)">
+ <div class="row">
+ <input id="v_${id}" value="12">
+ <input id="ah_${id}" value="100">
+ </div>
+ <div class="row">
+ <input id="s_${id}" value="2">
+ <input id="p_${id}" value="2">
+ </div>
+ </div>`;
 }
 
-function addLoad() {
-  let id = Date.now();
-  loads.push(id);
-
-  let html = `
-  <div id="l_${id}">
-    <hr>
-    <input id="l_name_${id}" placeholder="Nome utenza">
-    <div class="row">
-      <input id="l_volt_${id}" placeholder="Volt" value="12">
-      <input id="l_w_${id}" placeholder="Watt" value="100">
-    </div>
-  </div>`;
-  
-  document.getElementById("loads").innerHTML += html;
+function addLoad(){
+ let id=Date.now();
+ loads.push(id);
+ document.getElementById("loads").innerHTML+=`
+ <div id="l_${id}">
+ <hr>
+ <input id="lv_${id}" value="12">
+ <input id="lw_${id}" value="100">
+ </div>`;
 }
 
-function calculate() {
+function run(){
 
-  let systemV = Number(document.getElementById("voltage").value);
-  let power = Number(document.getElementById("power").value);
+ let sys=Number(document.getElementById("systemV").value);
+ let pwr=Number(document.getElementById("power").value);
 
-  let resultTech = "";
-  let resultQuote = "";
+ let txt="";
 
-  let inverter = power >= 8000 ? "Quattro 8000" : "MultiPlus 5000";
+ // inverter logico
+ let inverter="";
+ if(pwr>=8000) inverter="Quattro 8000";
+ else inverter="MultiPlus 5000";
 
-  resultTech += "<b>Inverter scelto:</b> " + inverter + "<br><br>";
+ txt+="<b>Inverter:</b> "+inverter+"<br><br>";
 
-  banks.forEach(id=>{
-    let v = Number(document.getElementById("b_volt_"+id).value);
-    let ah = Number(document.getElementById("b_ah_"+id).value);
-    let s = Number(document.getElementById("b_series_"+id).value);
-    let p = Number(document.getElementById("b_parallel_"+id).value);
+ // batterie
+ banks.forEach(id=>{
+   let v=Number(document.getElementById("v_"+id).value);
+   let ah=Number(document.getElementById("ah_"+id).value);
+   let s=Number(document.getElementById("s_"+id).value);
+   let p=Number(document.getElementById("p_"+id).value);
 
-    let totV = v*s;
-    let totAh = ah*p;
+   let totV=v*s;
+   let totAh=ah*p;
 
-    resultTech += "Banco: " + totV + "V " + totAh + "Ah<br>";
-  });
+   txt+="Banco: "+totV+"V "+totAh+"Ah<br>";
+ });
 
-  loads.forEach(id=>{
-    let v = Number(document.getElementById("l_volt_"+id).value);
-    let w = Number(document.getElementById("l_w_"+id).value);
+ // utenze DC
+ loads.forEach(id=>{
+   let v=Number(document.getElementById("lv_"+id).value);
 
-    if(v != systemV){
-      resultTech += "Conversione necessaria " + systemV + "V → " + v + "V<br>";
-      resultQuote += "<tr><td>Orion DC-DC</td><td>1</td></tr>";
-    }
-  });
+   if(v!=sys){
+     txt+="Serve Orion "+sys+"→"+v+"<br>";
+   }
+ });
 
-  resultQuote = `
-  <table class="table">
-  <tr><td>Inverter</td><td>1</td></tr>
-  ${resultQuote}
-  </table>`;
-
-  document.getElementById("tech").innerHTML = resultTech;
-  document.getElementById("quote").innerHTML = resultQuote;
+ document.getElementById("out").innerHTML=txt;
 }
 
 </script>
-
 </body>
 </html>
