@@ -1,192 +1,1144 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<title>Victron Configurator V4</title>
-
-<style>
-body{
-  font-family:Arial;
-  background:#eef2f7;
-  padding:20px;
-}
-
-.card{
-  background:#fff;
-  padding:20px;
-  border-radius:12px;
-  margin-bottom:15px;
-}
-
-input,select{
-  width:100%;
-  padding:10px;
-  margin-top:5px;
-  border-radius:6px;
-  border:1px solid #ccc;
-}
-
-button{
-  padding:12px;
-  margin-top:15px;
-  background:#1976f3;
-  color:#fff;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-h3{margin-top:20px}
-
-.warning{color:red;font-weight:bold}
-.ok{color:green;font-weight:bold}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Victron Configurator Nautica V3.1</title>
+  <style>
+    :root{
+      --bg:#eef2f7; --card:#ffffff; --text:#16202a; --muted:#627184; --line:#d9e1ea;
+      --blue:#1976f3; --blue-dark:#0f5fd0; --green:#0f9d58; --orange:#d97706; --red:#c62828;
+      --shadow:0 10px 24px rgba(18,36,64,.08); --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;padding:16px}
+    .wrap{max-width:1180px;margin:0 auto}
+    h1{margin:4px 0 6px;font-size:34px;line-height:1.1}
+    .subtitle{margin:0 0 16px;color:var(--muted);font-size:15px}
+    .card{background:var(--card);border-radius:var(--radius);padding:18px;margin-bottom:16px;box-shadow:var(--shadow);overflow:hidden}
+    .section-title{margin:0 0 12px;font-size:22px}
+    .badge{display:inline-block;background:#e8f0ff;color:var(--blue-dark);padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;margin-bottom:10px}
+    .grid{display:grid;grid-template-columns:1fr;gap:12px}
+    @media(min-width:800px){.grid-2{grid-template-columns:1fr 1fr}.grid-3{grid-template-columns:1fr 1fr 1fr}.grid-4{grid-template-columns:1fr 1fr 1fr 1fr}}
+    label{display:block;font-size:14px;font-weight:700;margin-bottom:6px}
+    input,select,textarea{width:100%;padding:13px 12px;border:1px solid var(--line);border-radius:14px;font-size:16px;background:#fff}
+    .check-row{display:flex;align-items:center;gap:10px;padding:8px 0}
+    .check-row input{width:18px;height:18px;margin:0;flex:0 0 auto}
+    .btns{display:grid;grid-template-columns:1fr;gap:10px;margin-top:14px}
+    @media(min-width:700px){.btns{grid-template-columns:1fr 1fr 1fr 1fr}}
+    button{border:none;background:var(--blue);color:#fff;padding:14px 16px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;width:100%}
+    button.secondary{background:#eaf2ff;color:var(--blue-dark)}
+    button.ghost{background:#edf1f5;color:#213547}
+    button.warn{background:#fff2e8;color:#9a3412}
+    .subcard{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fbfcfe;margin-bottom:10px}
+    .subhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+    .subhead strong{font-size:16px}
+    .small{font-size:13px;color:var(--muted)}
+    .empty{font-style:italic;color:var(--muted)}
+    .pill{display:inline-block;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:700;margin-right:6px;margin-bottom:6px}
+    .pill-ok{background:#e8f7ef;color:var(--green)}
+    .pill-warn{background:#fff4e5;color:var(--orange)}
+    .pill-bad{background:#fdecec;color:var(--red)}
+    .list{margin:6px 0 0;padding-left:18px}
+    .list li{margin-bottom:6px}
+    .table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:14px;background:#fff}
+    table{width:100%;min-width:980px;border-collapse:collapse;font-size:14px}
+    th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+    th{color:var(--muted);font-size:13px;font-weight:700;background:#fbfcfe}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;letter-spacing:.1px}
+    .totals{margin-top:14px;display:grid;gap:8px}
+    .total-row{display:flex;justify-content:space-between;gap:18px;font-size:15px}
+    .total-row strong{font-size:18px}
+    .note-box{border:1px dashed var(--line);border-radius:14px;padding:12px;background:#fbfcfe}
+    .split-note{display:grid;grid-template-columns:1fr;gap:12px}
+    @media(min-width:900px){.split-note{grid-template-columns:1fr 1fr}}
+    .technical-block{background:#f8fbff;border:1px solid #d9e9ff}
+    .calc-chip{display:inline-block;background:#f1f5fb;border:1px solid var(--line);color:var(--text);padding:8px 10px;border-radius:12px;font-size:13px;font-weight:700}
+  </style>
 </head>
-
 <body>
+<div class="wrap">
+  <h1>Victron Configurator</h1>
+  <p class="subtitle">V3.1 Nautica · BMS litio corretto · Nomi banco professionali · Gamma batterie ampliata · Preventivo e stampa interna.</p>
 
-<div class="card">
-<h2>Configurazione Impianto</h2>
+  <div class="card">
+    <div class="badge">Contesto: Nautica</div>
+    <h2 class="section-title">Dati generali</h2>
+    <div class="grid grid-4">
+      <div><label for="projectName">Nome progetto</label><input id="projectName" value="Impianto nautico V3.1" /></div>
+      <div><label for="customerType">Tipo cliente</label><select id="customerType"><option value="operatore">Operatore</option><option value="privato">Privato</option></select></div>
+      <div><label for="systemVoltage">Tensione impianto principale</label><select id="systemVoltage"><option value="12">12V</option><option value="24" selected>24V</option><option value="48">48V</option></select></div>
+      <div><label for="inverterPower">Potenza inverter richiesta (VA)</label><input id="inverterPower" type="number" value="8000" /></div>
 
-<label>Tensione sistema</label>
-<select id="volt">
-<option value="12">12V</option>
-<option value="24" selected>24V</option>
-<option value="48">48V</option>
-</select>
+      <div><label for="pvPower">Potenza FV totale (W)</label><input id="pvPower" type="number" value="1200" /></div>
+      <div><label for="gxChoice">Nodo GX / supervisione</label><select id="gxChoice"><option value="auto" selected>Auto</option><option value="cerbo">Cerbo GX</option><option value="ekrano">Ekrano GX</option><option value="none">Nessuno</option></select></div>
+      <div><label for="gxDisplay">Display locale</label><select id="gxDisplay"><option value="auto" selected>Auto</option><option value="none">Nessuno</option><option value="gx50">GX Touch 50</option><option value="gx70">GX Touch 70</option></select></div>
+      <div><label for="shoreChargerNeed">Caricatore AC dedicato</label><select id="shoreChargerNeed"><option value="auto" selected>Auto</option><option value="none">Nessuno</option><option value="ip22">Blue Smart IP22</option><option value="ip65">Blue Smart IP65</option><option value="ip43">Smart IP43</option><option value="centaur">Centaur</option><option value="skylla">Skylla</option></select></div>
 
-<label>Potenza inverter richiesta (W)</label>
-<input id="inv" type="number" value="1200">
+      <div class="check-row"><input id="hasShore" type="checkbox" checked /><label for="hasShore" style="margin:0;">Ingresso rete / banchina</label></div>
+      <div class="check-row"><input id="advancedDc" type="checkbox" checked /><label for="advancedDc" style="margin:0;">Distribuzione DC professionale</label></div>
+      <div class="check-row"><input id="wantMonitoring" type="checkbox" checked /><label for="wantMonitoring" style="margin:0;">Monitoraggio remoto / locale</label></div>
+      <div class="check-row"><input id="needBatteryMonitor" type="checkbox" checked /><label for="needBatteryMonitor" style="margin:0;">Battery monitor dedicato</label></div>
+    </div>
+  </div>
 
-<label>Batteria servizi (Ah)</label>
-<input id="ah" type="number" value="100">
+  <div class="card">
+    <h2 class="section-title">Banchi batteria</h2>
+    <div id="batteryBanks"></div>
+    <div class="btns" style="grid-template-columns:1fr 1fr;">
+      <button type="button" class="secondary" onclick="addBatteryBank()">Aggiungi banco</button>
+      <button type="button" class="ghost" onclick="resetBatteryBanks()">Reset banchi</button>
+    </div>
+  </div>
 
-<label>Tipo batteria</label>
-<select id="tipo">
-<option value="agm">AGM</option>
-<option value="gel">GEL</option>
-<option value="litio">Litio</option>
-</select>
+  <div class="card">
+    <h2 class="section-title">Generatori AC</h2>
+    <div id="generators"></div>
+    <div class="btns" style="grid-template-columns:1fr 1fr;">
+      <button type="button" class="secondary" onclick="addGenerator()">Aggiungi generatore</button>
+      <button type="button" class="ghost" onclick="resetGenerators()">Reset generatori</button>
+    </div>
+  </div>
 
-<label>Ingresso banchina</label>
-<select id="shore">
-<option value="si">Si</option>
-<option value="no">No</option>
-</select>
+  <div class="card">
+    <h2 class="section-title">Alternatori</h2>
+    <div id="alternators"></div>
+    <div class="btns" style="grid-template-columns:1fr 1fr;">
+      <button type="button" class="secondary" onclick="addAlternator()">Aggiungi alternatore</button>
+      <button type="button" class="ghost" onclick="resetAlternators()">Reset alternatori</button>
+    </div>
+  </div>
 
-<label>Generatore presente</label>
-<select id="gen">
-<option value="no">No</option>
-<option value="si">Si</option>
-</select>
+  <div class="card">
+    <h2 class="section-title">Utenze speciali DC a tensione diversa</h2>
+    <div id="dcLoads"></div>
+    <div class="btns" style="grid-template-columns:1fr 1fr;">
+      <button type="button" class="secondary" onclick="addDcLoad()">Aggiungi utenza DC</button>
+      <button type="button" class="ghost" onclick="resetDcLoads()">Reset utenze DC</button>
+    </div>
+    <p class="small" style="margin-top:10px;">Le utenze DC speciali compaiono nel progetto tecnico, ma non nel preventivo. Nel preventivo entra solo l’hardware Victron necessario.</p>
+  </div>
 
-<label>Monitoraggio richiesto</label>
-<select id="monitor">
-<option value="no">No</option>
-<option value="si">Si</option>
-</select>
+  <div class="card">
+    <h2 class="section-title">Servizi e costi interni</h2>
+    <div class="grid grid-4">
+      <div><label for="designHours">Ore progettazione</label><input id="designHours" type="number" value="4" /></div>
+      <div><label for="designHourlyCost">Costo orario interno (€)</label><input id="designHourlyCost" type="number" value="20" /></div>
+      <div><label for="shippingInternalCost">Costo interno trasporto (€)</label><input id="shippingInternalCost" type="number" value="35" /></div>
+      <div><label for="notesExtra">Nota libera progetto</label><input id="notesExtra" value="Installazione nautica con supervisione completa" /></div>
+    </div>
+    <div class="btns">
+      <button onclick="generateProject()">Genera configurazione</button>
+      <button class="secondary" onclick="saveProject()">Salva progetto</button>
+      <button class="ghost" onclick="loadProject()">Carica progetto</button>
+      <button class="warn" onclick="clearProject()">Cancella salvataggio</button>
+    </div>
+  </div>
 
-<button onclick="calcola()">Genera impianto</button>
+  <div class="card technical-block">
+    <h2 class="section-title">Sintesi configurazione e relazione tecnica</h2>
+    <div id="configSummary" class="empty">Premi “Genera configurazione”.</div>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">Componenti selezionati · progetto tecnico</h2>
+    <div id="componentsTable" class="empty">Nessun componente selezionato.</div>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">Preventivo cliente</h2>
+    <div id="quoteTable" class="empty">Nessun preventivo ancora generato.</div>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">Stampa interna</h2>
+    <div id="internalTable" class="empty">Nessuna stampa interna ancora generata.</div>
+  </div>
 </div>
 
-<div class="card" id="output"></div>
-
 <script>
+const PRODUCT_CATALOG = [
+  {id:"battery_bank", code:"BAT-TECH", name:"Banco batteria tecnico", family:"battery_virtual", voltages:[12,24,48], supplierTiers:[{minQty:1,cost:0}], quoteMode:"hide"},
+  {id:"dc_load_virtual", code:"DC-LOAD", name:"Utenza DC speciale", family:"virtual_load", voltages:[12,24,48], supplierTiers:[{minQty:1,cost:0}], quoteMode:"hide"},
 
-function calcola(){
+  {id:"victron_agm_12_60", code:"BAT412550084", name:"Victron AGM 12V 60Ah", family:"battery_real", chem:"agm", singleVoltage:12, singleAh:60, supplierTiers:[{minQty:1,cost:165}], quoteMode:"show"},
+  {id:"victron_agm_12_90", code:"BAT412800084", name:"Victron AGM 12V 90Ah", family:"battery_real", chem:"agm", singleVoltage:12, singleAh:90, supplierTiers:[{minQty:1,cost:220}], quoteMode:"show"},
+  {id:"victron_agm_12_110", code:"BAT412101084", name:"Victron AGM 12V 110Ah", family:"battery_real", chem:"agm", singleVoltage:12, singleAh:110, supplierTiers:[{minQty:1,cost:255}], quoteMode:"show"},
+  {id:"victron_agm_12_220", code:"BAT412201084", name:"Victron AGM 12V 220Ah", family:"battery_real", chem:"agm", singleVoltage:12, singleAh:220, supplierTiers:[{minQty:1,cost:495}], quoteMode:"show"},
 
-let V = Number(document.getElementById("volt").value);
-let W = Number(document.getElementById("inv").value);
-let Ah = Number(document.getElementById("ah").value);
-let tipo = document.getElementById("tipo").value;
-let shore = document.getElementById("shore").value;
-let gen = document.getElementById("gen").value;
-let monitor = document.getElementById("monitor").value;
+  {id:"victron_gel_12_60", code:"BAT412550164", name:"Victron GEL 12V 60Ah", family:"battery_real", chem:"gel", singleVoltage:12, singleAh:60, supplierTiers:[{minQty:1,cost:178}], quoteMode:"show"},
+  {id:"victron_gel_12_90", code:"BAT412800164", name:"Victron GEL 12V 90Ah", family:"battery_real", chem:"gel", singleVoltage:12, singleAh:90, supplierTiers:[{minQty:1,cost:238}], quoteMode:"show"},
+  {id:"victron_gel_12_110", code:"BAT412101164", name:"Victron GEL 12V 110Ah", family:"battery_real", chem:"gel", singleVoltage:12, singleAh:110, supplierTiers:[{minQty:1,cost:275}], quoteMode:"show"},
+  {id:"victron_gel_12_220", code:"BAT412201164", name:"Victron GEL 12V 220Ah", family:"battery_real", chem:"gel", singleVoltage:12, singleAh:220, supplierTiers:[{minQty:1,cost:525}], quoteMode:"show"},
 
-// Energia disponibile
-let Wh = V * Ah;
+  {id:"victron_lithium_smart_12_100", code:"BAT512110610", name:"Lithium Battery Smart 12,8V 100Ah", family:"battery_real", chem:"lithium", singleVoltage:12.8, singleAh:100, supplierTiers:[{minQty:1,cost:940}], quoteMode:"show"},
+  {id:"victron_lithium_smart_12_160", code:"BAT512116610", name:"Lithium Battery Smart 12,8V 160Ah", family:"battery_real", chem:"lithium", singleVoltage:12.8, singleAh:160, supplierTiers:[{minQty:1,cost:1220}], quoteMode:"show"},
+  {id:"victron_lithium_smart_12_200", code:"BAT512120610", name:"Lithium Battery Smart 12,8V 200Ah", family:"battery_real", chem:"lithium", singleVoltage:12.8, singleAh:200, supplierTiers:[{minQty:1,cost:1420}], quoteMode:"show"},
+  {id:"victron_lithium_ng_12_200", code:"BAT512120620", name:"Lithium NG 12,8V 200Ah", family:"battery_real", chem:"lithium", singleVoltage:12.8, singleAh:200, supplierTiers:[{minQty:1,cost:1490}], quoteMode:"show"},
+  {id:"victron_lithium_ng_12_300", code:"BAT512130620", name:"Lithium NG 12,8V 300Ah", family:"battery_real", chem:"lithium", singleVoltage:12.8, singleAh:300, supplierTiers:[{minQty:1,cost:1790}], quoteMode:"show"},
 
-// LOGICA IMPIANTO
-let inverter="";
-let charger="";
-let note=[];
-let warning=[];
+  {id:"quattro_12_5000", code:"QUATTRO-12-5000", name:"Quattro 12/5000", family:"inverter_charger", series:"quattro", voltages:[12], powerVa:5000, supplierTiers:[{minQty:1,cost:1540}]},
+  {id:"quattro_24_5000", code:"QUATTRO-24-5000", name:"Quattro 24/5000", family:"inverter_charger", series:"quattro", voltages:[24], powerVa:5000, supplierTiers:[{minQty:1,cost:1620}]},
+  {id:"quattro_24_8000", code:"QUATTRO-24-8000", name:"Quattro 24/8000", family:"inverter_charger", series:"quattro", voltages:[24], powerVa:8000, supplierTiers:[{minQty:1,cost:2280}]},
+  {id:"quattro_24_10000", code:"QUATTRO-24-10000", name:"Quattro 24/10000", family:"inverter_charger", series:"quattro", voltages:[24], powerVa:10000, supplierTiers:[{minQty:1,cost:2740}]},
+  {id:"quattro_48_5000", code:"QUATTRO-48-5000", name:"Quattro 48/5000", family:"inverter_charger", series:"quattro", voltages:[48], powerVa:5000, supplierTiers:[{minQty:1,cost:1710}]},
+  {id:"quattro_48_8000", code:"QUATTRO-48-8000", name:"Quattro 48/8000", family:"inverter_charger", series:"quattro", voltages:[48], powerVa:8000, supplierTiers:[{minQty:1,cost:2390}]},
+  {id:"quattro_48_10000", code:"QUATTRO-48-10000", name:"Quattro 48/10000", family:"inverter_charger", series:"quattro", voltages:[48], powerVa:10000, supplierTiers:[{minQty:1,cost:2860}]},
 
-// SCELTA TECNICA
-if(gen=="si"){
-    inverter="Victron Quattro";
-    charger="Integrato";
-    note.push("Sistema avanzato: doppio ingresso AC (banchina + generatore)");
-}
-else if(W <= 2000){
-    inverter="Victron Phoenix";
-    charger="Victron Blue Smart";
-    note.push("Impianto base: inverter separato + caricatore");
-}
-else if(W <= 4000){
-    inverter="Victron MultiPlus";
-    charger="Integrato";
-    note.push("Impianto intermedio: inverter/charger");
-}
-else{
-    inverter="Victron MultiPlus alta potenza";
-    charger="Integrato";
-    warning.push("Attenzione: potenza elevata, verificare impianto");
-}
+  {id:"multiplus_ii_12_3000", code:"MULTI-12-3000", name:"MultiPlus-II 12/3000", family:"inverter_charger", series:"multiplus_ii", voltages:[12], powerVa:3000, supplierTiers:[{minQty:1,cost:860}]},
+  {id:"multiplus_ii_24_3000", code:"MULTI-24-3000", name:"MultiPlus-II 24/3000", family:"inverter_charger", series:"multiplus_ii", voltages:[24], powerVa:3000, supplierTiers:[{minQty:1,cost:890}]},
+  {id:"multiplus_ii_24_5000", code:"MULTI-24-5000", name:"MultiPlus-II 24/5000", family:"inverter_charger", series:"multiplus_ii", voltages:[24], powerVa:5000, supplierTiers:[{minQty:1,cost:1280}]},
+  {id:"multiplus_ii_48_5000", code:"MULTI-48-5000", name:"MultiPlus-II 48/5000", family:"inverter_charger", series:"multiplus_ii", voltages:[48], powerVa:5000, supplierTiers:[{minQty:1,cost:1390}]},
 
-// CONTROLLO BATTERIE
-if(W > Wh){
-    warning.push("⚠️ Batteria insufficiente per potenza richiesta");
-}
+  {id:"blue_smart_ip22_24_30", code:"BPC243044002", name:"Blue Smart IP22 24V 30A", family:"charger", chargerSeries:"ip22", voltages:[24], maxChargeA:30, supplierTiers:[{minQty:1,cost:195}]},
+  {id:"blue_smart_ip65_12_25", code:"BPC122531064", name:"Blue Smart IP65 12V 25A", family:"charger", chargerSeries:"ip65", voltages:[12], maxChargeA:25, supplierTiers:[{minQty:1,cost:225}]},
+  {id:"smart_ip43_24_25_1", code:"PSC242553085", name:"Smart IP43 24V 25A 1 output", family:"charger", chargerSeries:"ip43", voltages:[24], maxChargeA:25, supplierTiers:[{minQty:1,cost:315}]},
+  {id:"centaur_24_30", code:"CCH024030000", name:"Centaur 24V 30A", family:"charger", chargerSeries:"centaur", voltages:[24], maxChargeA:30, supplierTiers:[{minQty:1,cost:420}]},
+  {id:"skylla_ip44_24_80", code:"SKY024080000", name:"Skylla-IP44 24V 80A", family:"charger", chargerSeries:"skylla", voltages:[24], maxChargeA:80, supplierTiers:[{minQty:1,cost:980}]},
 
-// LITIO
-if(tipo=="litio"){
-    note.push("Necessario BMS per gestione batterie litio");
-}
+  {id:"mppt_100_30", code:"MPPT-100-30", name:"SmartSolar MPPT 100/30", family:"mppt", voltages:[12,24], maxPv:440, dataPorts:1, supplierTiers:[{minQty:1,cost:180}]},
+  {id:"mppt_100_50", code:"MPPT-100-50", name:"SmartSolar MPPT 100/50", family:"mppt", voltages:[12,24], maxPv:700, dataPorts:1, supplierTiers:[{minQty:1,cost:240}]},
+  {id:"mppt_150_35", code:"MPPT-150-35", name:"SmartSolar MPPT 150/35", family:"mppt", voltages:[12,24,48], maxPv:1000, dataPorts:1, supplierTiers:[{minQty:1,cost:260}]},
+  {id:"mppt_150_70", code:"MPPT-150-70", name:"SmartSolar MPPT 150/70", family:"mppt", voltages:[12,24,48], maxPv:2000, dataPorts:1, supplierTiers:[{minQty:1,cost:430}]},
+  {id:"mppt_250_100", code:"MPPT-250-100", name:"SmartSolar MPPT 250/100 VE.Can", family:"mppt", voltages:[12,24,48], maxPv:5000, dataPorts:1, supplierTiers:[{minQty:1,cost:780}]},
 
-// MONITORAGGIO
-let monitorTxt = (monitor=="si") 
-    ? "Sistema GX attivo"
-    : "Sistema base senza monitoraggio";
+  {id:"cerbo_gx", code:"CERBO-GX", name:"Cerbo GX", family:"gx", voltages:[12,24,48], veDirectPorts:3, supplierTiers:[{minQty:1,cost:265}]},
+  {id:"gx_touch_50", code:"GX-TOUCH-50", name:"GX Touch 50", family:"gx_display", voltages:[12,24,48], supplierTiers:[{minQty:1,cost:165}]},
+  {id:"gx_touch_70", code:"GX-TOUCH-70", name:"GX Touch 70", family:"gx_display", voltages:[12,24,48], supplierTiers:[{minQty:1,cost:235}]},
+  {id:"ekrano_gx", code:"EKRANO-GX", name:"Ekrano GX", family:"gx", voltages:[12,24,48], veDirectPorts:3, supplierTiers:[{minQty:1,cost:585}]},
+  {id:"vedirect_usb", code:"VE-DIRECT-USB", name:"VE.Direct to USB Interface", family:"data_accessory", voltages:[12,24,48], supplierTiers:[{minQty:1,cost:28}]},
 
-// PREVENTIVO
-let prezzo = W * 0.6;
-let iva = prezzo * 0.22;
-let totale = prezzo + iva;
+  {id:"smartshunt_500", code:"SMARTSHUNT-500", name:"SmartShunt 500A", family:"battery_monitor", voltages:[12,24,48], dataPorts:1, supplierTiers:[{minQty:1,cost:95}]},
+  {id:"lynx_distributor", code:"LYNX-DISTRIBUTOR", name:"Lynx Distributor", family:"dc_distribution", voltages:[12,24,48], supplierTiers:[{minQty:1,cost:310}]},
+  {id:"lynx_shunt", code:"LYNX-SHUNT", name:"Lynx Shunt VE.Can", family:"dc_distribution", voltages:[12,24,48], supplierTiers:[{minQty:1,cost:410}]},
 
-// COSTI INTERNI
-let costo = prezzo * 0.7;
-let margine = prezzo - costo;
-let marginePerc = (margine/prezzo)*100;
+  {id:"orion_xs_12", code:"ORION-XS-12-12-50", name:"Orion XS 12/12-50A", family:"dcdc", inV:12, outV:12, voltages:[12], supplierTiers:[{minQty:1,cost:330}]},
+  {id:"orion_xs_24", code:"ORION-XS-24-FAMILY", name:"Orion XS famiglia 24V", family:"dcdc", inV:24, outV:24, voltages:[24], supplierTiers:[{minQty:1,cost:360}]},
+  {id:"orion_tr_24_12", code:"ORI241217040", name:"Orion-Tr Smart 24/12", family:"dcdc_stepdown", inV:24, outV:12, voltages:[24], supplierTiers:[{minQty:1,cost:155}]},
+  {id:"orion_tr_48_12", code:"ORI481236120", name:"Orion-Tr Smart 48/12", family:"dcdc_stepdown", inV:48, outV:12, voltages:[48], supplierTiers:[{minQty:1,cost:220}]},
+  {id:"orion_tr_24_24", code:"ORI241236120", name:"Orion-Tr Smart 24/24", family:"dcdc_stepthrough", inV:24, outV:24, voltages:[24], supplierTiers:[{minQty:1,cost:185}]},
 
-// OUTPUT
-document.getElementById("output").innerHTML = `
+  {id:"argofet_100_3", code:"ARGOFET-100-3", name:"Argofet 100-3", family:"charge_splitter", voltages:[12,24], supplierTiers:[{minQty:1,cost:150}]},
+  {id:"argodiode_120_2", code:"ARGODIODE-120-2", name:"Argodiode 120-2", family:"charge_splitter", voltages:[12,24], supplierTiers:[{minQty:1,cost:115}]},
 
-<h3>Configurazione tecnica</h3>
-<b>Inverter:</b> ${inverter}<br>
-<b>Caricatore:</b> ${charger}<br>
-<b>Monitoraggio:</b> ${monitorTxt}
+  {id:"smart_bms", code:"SMART-BMS", name:"Smart BMS", family:"bms", voltages:[12,24], supplierTiers:[{minQty:1,cost:180}]},
+  {id:"lynx_smart_bms", code:"LYNX-SMART-BMS", name:"Lynx Smart BMS", family:"bms", voltages:[12,24,48], supplierTiers:[{minQty:1,cost:690}]}
+];
 
-<h3>Note tecniche</h3>
-${note.map(n=>"<div class='ok'>✔ "+n+"</div>").join("")}
+function euro(v){ return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(v || 0); }
+function uid(){ return Math.random().toString(36).slice(2,10); }
+function getTierCost(product, qty){ const tiers=[...(product.supplierTiers||[])].sort((a,b)=>b.minQty-a.minQty); const tier=tiers.find(t=>qty>=t.minQty)||tiers[tiers.length-1]; return tier?tier.cost:0; }
+function publicListFromCost(cost){ return cost/0.375; }
+function discountRate(customerType){ return customerType === 'operatore' ? 0.50 : 0.40; }
+function getNum(id, fallback=0){ const el=document.getElementById(id); return el ? Number(el.value || fallback) : fallback; }
+function getVal(id, fallback=''){ const el=document.getElementById(id); return el ? el.value : fallback; }
+function getChk(id){ const el=document.getElementById(id); return el ? !!el.checked : false; }
+function labelUsage(v){ return ({services:'servizi',start:'avviamento',dedicated:'dedicato',mixed:'misto'})[v] || v; }
+function labelChem(v){ return ({acid:'piombo',agm:'AGM',gel:'GEL',lithium:'litio'})[v] || v; }
+function addNote(arr, txt){ if (!arr.includes(txt)) arr.push(txt); }
 
-<h3>Warning</h3>
-${warning.length ? warning.map(w=>"<div class='warning'>"+w+"</div>").join("") : "Nessun problema rilevato"}
+let batteryBankIds = [], generatorIds = [], alternatorIds = [], dcLoadIds = [];
 
-<h3>Preventivo cliente</h3>
-Netto: €${prezzo.toFixed(2)}<br>
-IVA 22%: €${iva.toFixed(2)}<br>
-<b>Totale: €${totale.toFixed(2)}</b>
-
-<h3>Analisi interna</h3>
-Costo: €${costo.toFixed(2)}<br>
-Margine: €${margine.toFixed(2)} (${marginePerc.toFixed(1)}%)
-
-`;
-
+function defaultBankLabel(bank, idx){
+  if (bank.name && bank.name.trim()) return bank.name.trim();
+  const map = {services:'Banco servizi', start:'Banco avviamento', dedicated:'Banco dedicato', mixed:'Banco misto'};
+  return `${map[bank.usage] || 'Banco'} ${idx+1}`;
 }
 
+function addBatteryBank(data = {}){
+  const id = data.id || uid();
+  batteryBankIds.push(id);
+  renderBatteryBanks(data);
+}
+function removeBatteryBank(id){
+  batteryBankIds = batteryBankIds.filter(x => x !== id);
+  renderBatteryBanks();
+}
+function resetBatteryBanks(){
+  batteryBankIds = [];
+  addBatteryBank({origin:'existing', usage:'services', chemistry:'lithium', lithiumBmsStatus:'already_present', singleVoltage:12.8, singleAh:200, batteriesCount:2, seriesCount:2, parallelCount:1, name:'Banco servizi esistente', existingNoQuote:true});
+  addBatteryBank({origin:'new_victron', usage:'services', chemistry:'lithium', lithiumBmsStatus:'to_add', victronBatteryId:'victron_lithium_ng_12_300', singleVoltage:12.8, singleAh:300, batteriesCount:2, seriesCount:2, parallelCount:1, name:'Espansione banco servizi'});
+  addBatteryBank({origin:'existing', usage:'start', chemistry:'agm', singleVoltage:12, singleAh:95, batteriesCount:2, seriesCount:1, parallelCount:2, name:'Banco avviamento motori', existingNoQuote:true});
+}
+function renderBatteryBanks(seedData = {}){
+  const c = document.getElementById('batteryBanks');
+  c.innerHTML = batteryBankIds.map((id, idx) => {
+    const d = (seedData.id === id ? seedData : {});
+    return `
+      <div class="subcard">
+        <div class="subhead">
+          <strong>${d.name || 'Banco '+(idx+1)}</strong>
+          <button type="button" class="ghost" style="width:auto;padding:8px 12px;" onclick="removeBatteryBank('${id}')">Rimuovi</button>
+        </div>
+
+        <div class="grid grid-4">
+          <div>
+            <label>Origine banco</label>
+            <select id="bb_origin_${id}">
+              <option value="existing" ${(d.origin||'existing')==='existing'?'selected':''}>Esistente</option>
+              <option value="new_victron" ${d.origin==='new_victron'?'selected':''}>Nuova fornitura Victron</option>
+            </select>
+          </div>
+          <div>
+            <label>Uso banco</label>
+            <select id="bb_usage_${id}">
+              <option value="services" ${d.usage==='services'?'selected':''}>Servizi</option>
+              <option value="start" ${d.usage==='start'?'selected':''}>Avviamento</option>
+              <option value="dedicated" ${d.usage==='dedicated'?'selected':''}>Dedicato</option>
+              <option value="mixed" ${d.usage==='mixed'?'selected':''}>Misto</option>
+            </select>
+          </div>
+          <div>
+            <label>Tecnologia</label>
+            <select id="bb_chem_${id}">
+              <option value="acid" ${d.chemistry==='acid'?'selected':''}>Piombo</option>
+              <option value="agm" ${d.chemistry==='agm'?'selected':''}>AGM</option>
+              <option value="gel" ${d.chemistry==='gel'?'selected':''}>GEL</option>
+              <option value="lithium" ${d.chemistry==='lithium'?'selected':''}>Litio</option>
+            </select>
+          </div>
+          <div>
+            <label>Nome / nota banco</label>
+            <input id="bb_name_${id}" value="${d.name||''}">
+          </div>
+
+          <div>
+            <label>Modello batteria Victron</label>
+            <select id="bb_victron_${id}">
+              <option value="">Nessuno</option>
+              <option value="victron_agm_12_60" ${d.victronBatteryId==='victron_agm_12_60'?'selected':''}>AGM 12V 60Ah</option>
+              <option value="victron_agm_12_90" ${d.victronBatteryId==='victron_agm_12_90'?'selected':''}>AGM 12V 90Ah</option>
+              <option value="victron_agm_12_110" ${d.victronBatteryId==='victron_agm_12_110'?'selected':''}>AGM 12V 110Ah</option>
+              <option value="victron_agm_12_220" ${d.victronBatteryId==='victron_agm_12_220'?'selected':''}>AGM 12V 220Ah</option>
+              <option value="victron_gel_12_60" ${d.victronBatteryId==='victron_gel_12_60'?'selected':''}>GEL 12V 60Ah</option>
+              <option value="victron_gel_12_90" ${d.victronBatteryId==='victron_gel_12_90'?'selected':''}>GEL 12V 90Ah</option>
+              <option value="victron_gel_12_110" ${d.victronBatteryId==='victron_gel_12_110'?'selected':''}>GEL 12V 110Ah</option>
+              <option value="victron_gel_12_220" ${d.victronBatteryId==='victron_gel_12_220'?'selected':''}>GEL 12V 220Ah</option>
+              <option value="victron_lithium_smart_12_100" ${d.victronBatteryId==='victron_lithium_smart_12_100'?'selected':''}>Lithium Smart 12,8V 100Ah</option>
+              <option value="victron_lithium_smart_12_160" ${d.victronBatteryId==='victron_lithium_smart_12_160'?'selected':''}>Lithium Smart 12,8V 160Ah</option>
+              <option value="victron_lithium_smart_12_200" ${d.victronBatteryId==='victron_lithium_smart_12_200'?'selected':''}>Lithium Smart 12,8V 200Ah</option>
+              <option value="victron_lithium_ng_12_200" ${d.victronBatteryId==='victron_lithium_ng_12_200'?'selected':''}>Lithium NG 12,8V 200Ah</option>
+              <option value="victron_lithium_ng_12_300" ${d.victronBatteryId==='victron_lithium_ng_12_300'?'selected':''}>Lithium NG 12,8V 300Ah</option>
+            </select>
+          </div>
+          <div>
+            <label>Volt batteria singola</label>
+            <select id="bb_singlev_${id}">
+              <option value="2" ${Number(d.singleVoltage)===2?'selected':''}>2V</option>
+              <option value="6" ${Number(d.singleVoltage)===6?'selected':''}>6V</option>
+              <option value="12" ${(Number(d.singleVoltage)===12||Number(d.singleVoltage)===0)?'selected':''}>12V</option>
+              <option value="12.8" ${Number(d.singleVoltage)===12.8?'selected':''}>12,8V</option>
+            </select>
+          </div>
+          <div>
+            <label>Ah batteria singola</label>
+            <input id="bb_singleah_${id}" type="number" value="${d.singleAh||100}">
+          </div>
+          <div>
+            <label>Batterie totali nel banco</label>
+            <input id="bb_count_${id}" type="number" value="${d.batteriesCount||4}">
+          </div>
+
+          <div>
+            <label>N. in serie (S)</label>
+            <input id="bb_series_${id}" type="number" value="${d.seriesCount||2}">
+          </div>
+          <div>
+            <label>N. in parallelo (P)</label>
+            <input id="bb_parallel_${id}" type="number" value="${d.parallelCount||2}">
+          </div>
+          <div>
+            <label>Gestione litio / BMS</label>
+            <select id="bb_bms_${id}">
+              <option value="na" ${(d.lithiumBmsStatus||'na')==='na'?'selected':''}>N/A</option>
+              <option value="already_present" ${d.lithiumBmsStatus==='already_present'?'selected':''}>BMS già presente</option>
+              <option value="to_add" ${d.lithiumBmsStatus==='to_add'?'selected':''}>BMS da aggiungere</option>
+              <option value="unknown" ${d.lithiumBmsStatus==='unknown'?'selected':''}>Non noto</option>
+            </select>
+          </div>
+          <div class="check-row">
+            <input id="bb_noquote_${id}" type="checkbox" ${d.existingNoQuote!==false?'checked':''}>
+            <label for="bb_noquote_${id}" style="margin:0;">Escludi dal preventivo</label>
+          </div>
+
+          <div>
+            <label>Risultato banco</label>
+            <div class="calc-chip" id="bb_calc_${id}">—</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  batteryBankIds.forEach(id => updateBatteryCalc(id));
+}
+function updateBatteryCalc(id){
+  const v = Number(getVal(`bb_singlev_${id}`, 12));
+  const ah = getNum(`bb_singleah_${id}`, 100);
+  const s = getNum(`bb_series_${id}`, 1);
+  const p = getNum(`bb_parallel_${id}`, 1);
+  const count = getNum(`bb_count_${id}`, 1);
+  const el = document.getElementById(`bb_calc_${id}`);
+  if (!el) return;
+  el.textContent = `${(v*s).toFixed(1)}V · ${(ah*p).toFixed(0)}Ah · ${count} batterie`;
+}
+function readBatteryBanks(){
+  return batteryBankIds.map(id => {
+    const origin = getVal(`bb_origin_${id}`, 'existing');
+    let victronBatteryId = getVal(`bb_victron_${id}`, '');
+    let singleVoltage = Number(getVal(`bb_singlev_${id}`, 12));
+    let singleAh = getNum(`bb_singleah_${id}`, 100);
+    const product = PRODUCT_CATALOG.find(p => p.id === victronBatteryId);
+    let chemistry = getVal(`bb_chem_${id}`, 'agm');
+
+    if (origin === 'new_victron' && product) {
+      singleVoltage = Number(product.singleVoltage || singleVoltage);
+      singleAh = Number(product.singleAh || singleAh);
+      chemistry = product.chem || chemistry;
+    }
+
+    const seriesCount = getNum(`bb_series_${id}`, 1);
+    const parallelCount = getNum(`bb_parallel_${id}`, 1);
+    const batteriesCount = getNum(`bb_count_${id}`, 1);
+
+    return {
+      id,
+      origin,
+      usage:getVal(`bb_usage_${id}`, 'services'),
+      chemistry,
+      victronBatteryId,
+      singleVoltage,
+      singleAh,
+      batteriesCount,
+      seriesCount,
+      parallelCount,
+      bankVoltage: singleVoltage * seriesCount,
+      bankAh: singleAh * parallelCount,
+      name:getVal(`bb_name_${id}`, ''),
+      existingNoQuote:getChk(`bb_noquote_${id}`),
+      lithiumBmsStatus:getVal(`bb_bms_${id}`, 'na')
+    };
+  });
+}
+
+function addGenerator(data = {}){
+  const id = data.id || uid();
+  generatorIds.push(id);
+  renderGenerators(data);
+}
+function removeGenerator(id){
+  generatorIds = generatorIds.filter(x => x !== id);
+  renderGenerators();
+}
+function resetGenerators(){
+  generatorIds = [];
+  addGenerator({name:'Gen 1', kw:6, voltage:230, phase:'mono'});
+}
+function renderGenerators(seedData = {}){
+  const c = document.getElementById('generators');
+  c.innerHTML = generatorIds.map((id, idx) => {
+    const d = (seedData.id === id ? seedData : {});
+    return `
+      <div class="subcard">
+        <div class="subhead">
+          <strong>Generatore ${idx+1}</strong>
+          <button type="button" class="ghost" style="width:auto;padding:8px 12px;" onclick="removeGenerator('${id}')">Rimuovi</button>
+        </div>
+        <div class="grid grid-4">
+          <div><label>Nome</label><input id="gen_name_${id}" value="${d.name||'Gen '+(idx+1)}"></div>
+          <div><label>Potenza (kW)</label><input id="gen_kw_${id}" type="number" value="${d.kw||0}"></div>
+          <div><label>Tensione AC</label><select id="gen_v_${id}"><option value="230" ${Number(d.voltage)!==400?'selected':''}>230V</option><option value="400" ${Number(d.voltage)===400?'selected':''}>400V</option></select></div>
+          <div><label>Fase</label><select id="gen_phase_${id}"><option value="mono" ${d.phase!=='tri'?'selected':''}>Monofase</option><option value="tri" ${d.phase==='tri'?'selected':''}>Trifase</option></select></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+function readGenerators(){
+  return generatorIds.map(id => ({
+    id,
+    name:getVal(`gen_name_${id}`, 'Generatore'),
+    kw:getNum(`gen_kw_${id}`,0),
+    voltage:getNum(`gen_v_${id}`,230),
+    phase:getVal(`gen_phase_${id}`,'mono')
+  })).filter(g => g.kw > 0);
+}
+
+function addAlternator(data = {}){
+  const id = data.id || uid();
+  alternatorIds.push(id);
+  renderAlternators(data);
+}
+function removeAlternator(id){
+  alternatorIds = alternatorIds.filter(x => x !== id);
+  renderAlternators();
+}
+function resetAlternators(){
+  alternatorIds = [];
+  addAlternator({name:'Alternatore 1', voltage:24, amps:120, target:'services'});
+}
+function renderAlternators(seedData = {}){
+  const c = document.getElementById('alternators');
+  c.innerHTML = alternatorIds.map((id, idx) => {
+    const d = (seedData.id === id ? seedData : {});
+    return `
+      <div class="subcard">
+        <div class="subhead">
+          <strong>Alternatore ${idx+1}</strong>
+          <button type="button" class="ghost" style="width:auto;padding:8px 12px;" onclick="removeAlternator('${id}')">Rimuovi</button>
+        </div>
+        <div class="grid grid-4">
+          <div><label>Nome</label><input id="alt_name_${id}" value="${d.name||'Alternatore '+(idx+1)}"></div>
+          <div><label>Tensione nominale</label><select id="alt_v_${id}"><option value="12" ${Number(d.voltage)!==24?'selected':''}>12V</option><option value="24" ${Number(d.voltage)===24?'selected':''}>24V</option></select></div>
+          <div><label>Corrente max (A)</label><input id="alt_a_${id}" type="number" value="${d.amps||0}"></div>
+          <div><label>Banco servito</label><select id="alt_target_${id}"><option value="services" ${d.target!=='start'&&d.target!=='mixed'?'selected':''}>Servizi</option><option value="start" ${d.target==='start'?'selected':''}>Avviamento</option><option value="mixed" ${d.target==='mixed'?'selected':''}>Misto</option></select></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+function readAlternators(){
+  return alternatorIds.map(id => ({
+    id,
+    name:getVal(`alt_name_${id}`,'Alternatore'),
+    voltage:getNum(`alt_v_${id}`,12),
+    amps:getNum(`alt_a_${id}`,0),
+    target:getVal(`alt_target_${id}`,'services')
+  })).filter(a => a.amps > 0);
+}
+
+function addDcLoad(data = {}){
+  const id = data.id || uid();
+  dcLoadIds.push(id);
+  renderDcLoads(data);
+}
+function removeDcLoad(id){
+  dcLoadIds = dcLoadIds.filter(x => x !== id);
+  renderDcLoads();
+}
+function resetDcLoads(){
+  dcLoadIds = [];
+  addDcLoad({name:'Elettronica 12V', voltage:12, watts:120, qty:1, criticality:'essential'});
+}
+function renderDcLoads(seedData = {}){
+  const c = document.getElementById('dcLoads');
+  c.innerHTML = dcLoadIds.map((id, idx) => {
+    const d = (seedData.id === id ? seedData : {});
+    return `
+      <div class="subcard">
+        <div class="subhead">
+          <strong>Utenza DC ${idx+1}</strong>
+          <button type="button" class="ghost" style="width:auto;padding:8px 12px;" onclick="removeDcLoad('${id}')">Rimuovi</button>
+        </div>
+        <div class="grid grid-4">
+          <div><label>Nome utenza</label><input id="dcl_name_${id}" value="${d.name||'Utenza DC '+(idx+1)}"></div>
+          <div><label>Tensione richiesta</label><select id="dcl_v_${id}"><option value="12" ${Number(d.voltage)!==24&&Number(d.voltage)!==48?'selected':''}>12V</option><option value="24" ${Number(d.voltage)===24?'selected':''}>24V</option><option value="48" ${Number(d.voltage)===48?'selected':''}>48V</option></select></div>
+          <div><label>Assorbimento / potenza (W)</label><input id="dcl_w_${id}" type="number" value="${d.watts||0}"></div>
+          <div><label>Quantità</label><input id="dcl_qty_${id}" type="number" value="${d.qty||1}"></div>
+          <div><label>Criticità</label><select id="dcl_crit_${id}"><option value="continuous" ${d.criticality==='continuous'?'selected':''}>Continua</option><option value="intermittent" ${d.criticality==='intermittent'?'selected':''}>Intermittente</option><option value="essential" ${d.criticality!=='continuous'&&d.criticality!=='intermittent'?'selected':''}>Essenziale</option></select></div>
+          <div><label>Nota</label><input id="dcl_note_${id}" value="${d.note||''}"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+function readDcLoads(){
+  return dcLoadIds.map(id => ({
+    id,
+    name:getVal(`dcl_name_${id}`,'Utenza DC'),
+    voltage:getNum(`dcl_v_${id}`,12),
+    watts:getNum(`dcl_w_${id}`,0),
+    qty:getNum(`dcl_qty_${id}`,1),
+    criticality:getVal(`dcl_crit_${id}`,'essential'),
+    note:getVal(`dcl_note_${id}`,'')
+  })).filter(l => l.watts > 0);
+}
+
+function getFormData(){
+  return {
+    projectName:getVal('projectName'),
+    customerType:getVal('customerType'),
+    systemVoltage:getNum('systemVoltage'),
+    inverterPower:getNum('inverterPower'),
+    pvPower:getNum('pvPower'),
+    gxChoice:getVal('gxChoice'),
+    gxDisplay:getVal('gxDisplay'),
+    shoreChargerNeed:getVal('shoreChargerNeed'),
+    hasShore:getChk('hasShore'),
+    advancedDc:getChk('advancedDc'),
+    wantMonitoring:getChk('wantMonitoring'),
+    needBatteryMonitor:getChk('needBatteryMonitor'),
+    designHours:getNum('designHours'),
+    designHourlyCost:getNum('designHourlyCost'),
+    shippingInternalCost:getNum('shippingInternalCost'),
+    notesExtra:getVal('notesExtra'),
+    batteryBanks:readBatteryBanks(),
+    generators:readGenerators(),
+    alternators:readAlternators(),
+    dcLoads:readDcLoads()
+  };
+}
+
+function findInverter(input){
+  const needDualAc = input.hasShore || input.generators.length > 0;
+  const candidates = PRODUCT_CATALOG
+    .filter(p => p.family === 'inverter_charger' && p.voltages.includes(input.systemVoltage))
+    .filter(p => needDualAc ? p.series === 'quattro' : true)
+    .sort((a,b)=>(a.powerVa||0)-(b.powerVa||0));
+  return candidates.find(c => (c.powerVa || 0) >= input.inverterPower) || candidates[candidates.length - 1] || null;
+}
+
+function pickMppts(input){
+  if (input.pvPower <= 0) return [];
+  const c = PRODUCT_CATALOG.filter(p => p.family === 'mppt' && p.voltages.includes(input.systemVoltage)).sort((a,b)=>(a.maxPv||0)-(b.maxPv||0));
+  const one = c.find(x => (x.maxPv || 0) >= input.pvPower);
+  if (one) return [{...one, qty:1, role:'Regolatore fotovoltaico', quoteMode:'show'}];
+  const max = c[c.length - 1];
+  if (!max) return [];
+  return [{...max, qty:Math.ceil(input.pvPower / (max.maxPv || 1)), role:'Regolatori fotovoltaici in parallelo', quoteMode:'show'}];
+}
+
+function pickGx(input, notes){
+  if (!input.wantMonitoring || input.gxChoice === 'none') return [];
+  const items = [];
+  if (input.gxChoice === 'ekrano') {
+    items.push({...PRODUCT_CATALOG.find(p => p.id === 'ekrano_gx'), qty:1, role:'Nodo GX principale', quoteMode:'show'});
+    addNote(notes, 'Selezionato Ekrano GX per supervisione locale integrata con touchscreen.');
+    return items;
+  }
+  if (input.gxChoice === 'cerbo') {
+    items.push({...PRODUCT_CATALOG.find(p => p.id === 'cerbo_gx'), qty:1, role:'Nodo GX principale', quoteMode:'show'});
+    if (input.gxDisplay === 'gx70') items.push({...PRODUCT_CATALOG.find(p => p.id === 'gx_touch_70'), qty:1, role:'Display locale Cerbo', quoteMode:'show'});
+    else if (input.gxDisplay !== 'none') items.push({...PRODUCT_CATALOG.find(p => p.id === 'gx_touch_50'), qty:1, role:'Display locale Cerbo', quoteMode:'show'});
+    addNote(notes, 'Selezionato Cerbo GX con display associato quando richiesto.');
+    return items;
+  }
+  const complex = input.generators.length > 0 || input.batteryBanks.length > 2 || input.dcLoads.length > 0;
+  if (complex) {
+    items.push({...PRODUCT_CATALOG.find(p => p.id === 'ekrano_gx'), qty:1, role:'Nodo GX principale', quoteMode:'show'});
+    addNote(notes, 'Auto-selezionato Ekrano GX per sistema nautico articolato.');
+  } else {
+    items.push({...PRODUCT_CATALOG.find(p => p.id === 'cerbo_gx'), qty:1, role:'Nodo GX principale', quoteMode:'show'});
+    const d = input.gxDisplay === 'gx70' ? 'gx_touch_70' : 'gx_touch_50';
+    if (input.gxDisplay !== 'none') items.push({...PRODUCT_CATALOG.find(p => p.id === d), qty:1, role:'Display locale Cerbo', quoteMode:'show'});
+    addNote(notes, 'Auto-selezionato Cerbo GX come soluzione modulare di supervisione.');
+  }
+  return items;
+}
+
+function pickBatteryProducts(input, notes, warnings){
+  const items = [];
+  input.batteryBanks.forEach((b, idx) => {
+    const label = defaultBankLabel(b, idx);
+    if (b.origin === 'new_victron' && b.victronBatteryId) {
+      const p = PRODUCT_CATALOG.find(x => x.id === b.victronBatteryId);
+      if (p) {
+        items.push({...p, qty:b.batteriesCount, role:label, quoteMode:'show'});
+        addNote(notes, `${label}: batterie Victron nuove incluse in preventivo.`);
+      }
+    } else {
+      items.push({...PRODUCT_CATALOG.find(x => x.id === 'battery_bank'), qty:1, role:label, quoteMode:'hide', technicalLabel:label});
+      addNote(notes, `${label}: considerato esistente e quindi escluso dal preventivo.`);
+    }
+    if (b.seriesCount * b.parallelCount !== b.batteriesCount) warnings.push(`${label}: il totale batterie non coincide con la configurazione ${b.seriesCount}S${b.parallelCount}P.`);
+  });
+  return items;
+}
+
+function pickBms(input, notes, warnings){
+  const items = [];
+  input.batteryBanks.forEach((b, idx) => {
+    if (b.chemistry !== 'lithium') return;
+    const label = defaultBankLabel(b, idx);
+
+    if (b.lithiumBmsStatus === 'already_present') {
+      addNote(notes, `${label}: banco litio con BMS dichiarato già presente.`);
+      return;
+    }
+
+    if (b.lithiumBmsStatus === 'unknown') {
+      warnings.push(`${label}: banco litio con gestione BMS non dichiarata. Verifica tecnica obbligatoria.`);
+      const proposed = (input.advancedDc || b.usage === 'services' || b.usage === 'mixed')
+        ? PRODUCT_CATALOG.find(p => p.id === 'lynx_smart_bms')
+        : PRODUCT_CATALOG.find(p => p.id === 'smart_bms');
+      if (proposed) {
+        items.push({...proposed, qty:1, role:`BMS consigliato per ${label}`, quoteMode:'show'});
+        addNote(notes, `${label}: proposta BMS consigliata in quanto lo stato della gestione litio non è noto.`);
+      }
+      return;
+    }
+
+    if (b.lithiumBmsStatus === 'to_add') {
+      const proposed = (input.advancedDc || b.usage === 'services' || b.usage === 'mixed')
+        ? PRODUCT_CATALOG.find(p => p.id === 'lynx_smart_bms')
+        : PRODUCT_CATALOG.find(p => p.id === 'smart_bms');
+      if (proposed) {
+        items.push({...proposed, qty:1, role:`BMS per ${label}`, quoteMode:'show'});
+        addNote(notes, `${label}: aggiunto BMS da preventivare per il banco litio.`);
+      }
+    }
+  });
+  return items;
+}
+
+function pickBatteryMonitor(input, notes){
+  if (!input.needBatteryMonitor) return [];
+  const s = input.batteryBanks.find(b => b.usage === 'services' || b.usage === 'mixed');
+  if (!s) return [];
+  addNote(notes, 'Aggiunto battery monitor dedicato al banco servizi.');
+  return [{...PRODUCT_CATALOG.find(p => p.id === 'smartshunt_500'), qty:1, role:'Battery monitor banco servizi', quoteMode:'show'}];
+}
+
+function pickDcDistribution(input, notes){
+  if (!input.advancedDc) return [];
+  const items = [{...PRODUCT_CATALOG.find(p => p.id === 'lynx_distributor'), qty:1, role:'Distribuzione DC', quoteMode:'show'}];
+  if (input.batteryBanks.some(b => b.chemistry === 'lithium')) items.push({...PRODUCT_CATALOG.find(p => p.id === 'lynx_shunt'), qty:1, role:'Monitoraggio / distribuzione DC', quoteMode:'show'});
+  addNote(notes, 'Distribuzione DC professionale selezionata.');
+  return items;
+}
+
+function pickAlternatorHardware(input, notes){
+  if (!input.alternators.length) return [];
+  const items = [];
+  const service = input.alternators.filter(a => a.target === 'services' || a.target === 'mixed');
+  const start = input.alternators.filter(a => a.target === 'start');
+
+  if (service.length) {
+    service.forEach(alt => {
+      if (alt.voltage === input.systemVoltage) {
+        const p = PRODUCT_CATALOG.find(x => x.family === 'dcdc' && x.inV === input.systemVoltage);
+        if (p) items.push({...p, qty:1, role:`Carica da ${alt.name} verso banco servizi`, quoteMode:'show'});
+      } else {
+        const step = PRODUCT_CATALOG.find(x => x.family === 'dcdc_stepdown' && x.inV === input.systemVoltage && x.outV === alt.voltage)
+          || PRODUCT_CATALOG.find(x => x.family === 'dcdc_stepdown' && x.inV === alt.voltage && x.outV === input.systemVoltage)
+          || PRODUCT_CATALOG.find(x => x.family === 'dcdc_stepthrough' && x.inV === alt.voltage);
+        if (step) items.push({...step, qty:1, role:`Adattamento ${alt.name} verso bus ${input.systemVoltage}V`, quoteMode:'show'});
+      }
+      addNote(notes, `Alternatore ${alt.name}: prevista logica di carica dedicata verso il banco servizi.`);
+    });
+  }
+
+  if (start.length) {
+    const splitter = PRODUCT_CATALOG.find(x => x.id === (start.length > 1 ? 'argofet_100_3' : 'argodiode_120_2'));
+    if (splitter) items.push({...splitter, qty:1, role:'Ripartizione / mantenimento banchi avviamento', quoteMode:'show'});
+    addNote(notes, 'Prevista gestione dedicata dei banchi avviamento tramite partitore / ripartitore di carica.');
+  }
+
+  return items;
+}
+
+function pickDcLoadsHardware(input, notes){
+  const items = [];
+  input.dcLoads.forEach((l, idx) => {
+    items.push({id:'dc_load_virtual', code:'LOAD-'+(idx+1), name:l.name, family:'virtual_load', qty:l.qty, role:`Utenza DC ${l.voltage}V`, quoteMode:'hide', technicalLabel:`${l.name} ${l.voltage}V ${l.watts}W`});
+    if (l.voltage !== input.systemVoltage) {
+      const conv = PRODUCT_CATALOG.find(x => x.family === 'dcdc_stepdown' && x.inV === input.systemVoltage && x.outV === l.voltage);
+      if (conv) {
+        items.push({...conv, qty:1, role:`Conversione ${input.systemVoltage}V → ${l.voltage}V per ${l.name}`, quoteMode:'show'});
+        addNote(notes, `Utenza ${l.name} a ${l.voltage}V: aggiunto convertitore DC-DC Victron dedicato.`);
+      } else {
+        addNote(notes, `Utenza ${l.name} a ${l.voltage}V: necessario prevedere conversione DC-DC dedicata da verificare.`);
+      }
+    } else {
+      addNote(notes, `Utenza ${l.name}: lavora alla stessa tensione del bus principale e non richiede conversione dedicata.`);
+    }
+  });
+  return items;
+}
+
+function pickShoreCharger(input, notes){
+  if (!input.hasShore) return [];
+  const service = input.batteryBanks.filter(b => b.usage === 'services' || b.usage === 'mixed');
+  if (!service.length) return [];
+  const totalAh = service.reduce((s,b)=>s+b.bankAh,0);
+  const lithium = service.some(b => b.chemistry === 'lithium');
+  const manual = input.shoreChargerNeed;
+  let charger = null;
+
+  if (manual === 'ip22') charger = PRODUCT_CATALOG.find(p => p.chargerSeries === 'ip22' && p.voltages.includes(input.systemVoltage));
+  else if (manual === 'ip65') charger = PRODUCT_CATALOG.find(p => p.chargerSeries === 'ip65' && p.voltages.includes(input.systemVoltage));
+  else if (manual === 'ip43') charger = PRODUCT_CATALOG.find(p => p.chargerSeries === 'ip43' && p.voltages.includes(input.systemVoltage));
+  else if (manual === 'centaur') charger = PRODUCT_CATALOG.find(p => p.chargerSeries === 'centaur' && p.voltages.includes(input.systemVoltage));
+  else if (manual === 'skylla') charger = PRODUCT_CATALOG.find(p => p.chargerSeries === 'skylla' && p.voltages.includes(input.systemVoltage));
+  else if (manual !== 'none') {
+    if (lithium || totalAh >= 400) charger = PRODUCT_CATALOG.find(p => p.chargerSeries === 'skylla' && p.voltages.includes(input.systemVoltage)) || PRODUCT_CATALOG.find(p => p.chargerSeries === 'ip43' && p.voltages.includes(input.systemVoltage));
+    else if (service.length > 1) charger = PRODUCT_CATALOG.find(p => p.chargerSeries === 'ip43' && p.voltages.includes(input.systemVoltage));
+    else charger = PRODUCT_CATALOG.find(p => p.chargerSeries === 'ip22' && p.voltages.includes(input.systemVoltage)) || PRODUCT_CATALOG.find(p => p.chargerSeries === 'ip65' && p.voltages.includes(input.systemVoltage));
+  }
+
+  if (!charger) return [];
+  addNote(notes, `Previsto caricatore AC dedicato della famiglia ${charger.chargerSeries.toUpperCase()} in funzione del banco servizi e dell’uso di bordo.`);
+  return [{...charger, qty:1, role:'Caricatore AC dedicato', quoteMode:'show'}];
+}
+
+function buildBatteryNotes(input, notes, warnings){
+  input.batteryBanks.forEach((b, idx) => {
+    const label = defaultBankLabel(b, idx);
+    addNote(notes, `${label}: ${b.batteriesCount} batterie da ${b.singleVoltage}V ${b.singleAh}Ah in configurazione ${b.seriesCount}S${b.parallelCount}P → ${b.bankVoltage}V ${b.bankAh}Ah, uso ${labelUsage(b.usage)}, tecnologia ${labelChem(b.chemistry)}.`);
+    if ((b.usage === 'services' || b.usage === 'mixed') && b.bankVoltage !== input.systemVoltage) warnings.push(`${label}: banco servizi a ${b.bankVoltage}V diverso dalla tensione impianto principale ${input.systemVoltage}V.`);
+  });
+}
+
+function mergeSameProducts(items){
+  const map = new Map();
+  items.forEach(item => {
+    const key = `${item.id}|${item.role||''}|${item.quoteMode||'show'}`;
+    if (!map.has(key)) map.set(key, {...item});
+    else map.get(key).qty += (item.qty || 1);
+  });
+  return [...map.values()];
+}
+
+function buildAutoConfig(input){
+  const selected = [];
+  const notes = [];
+  const warnings = [];
+  const checks = [];
+
+  buildBatteryNotes(input, notes, warnings);
+  pickBatteryProducts(input, notes, warnings).forEach(i => selected.push(i));
+
+  const inverter = findInverter(input);
+  if (inverter) {
+    selected.push({...inverter, qty:1, role:'Inverter / Charger principale', quoteMode:'show'});
+    if ((inverter.powerVa || 0) < input.inverterPower) warnings.push(`Richiesta ${input.inverterPower}VA, ma il modello selezionato si ferma a ${inverter.powerVa}VA. Verificare architettura con unità multiple.`);
+    else checks.push(`Potenza inverter selezionata coerente con la richiesta (${inverter.powerVa}VA).`);
+    if (inverter.series === 'quattro') addNote(notes, 'Selezionato Quattro per gestione di due sorgenti AC indipendenti o architettura nautica più evoluta.');
+    else addNote(notes, 'Selezionato MultiPlus-II in quanto la configurazione non richiede necessariamente doppio ingresso AC.');
+  } else {
+    warnings.push('Nessun inverter/caricatore compatibile trovato nel catalogo iniziale.');
+  }
+
+  pickMppts(input).forEach(i => selected.push(i));
+  if (input.pvPower > 0) addNote(notes, 'La taglia del regolatore FV è stata scelta in funzione della potenza fotovoltaica dichiarata.');
+  pickGx(input, notes).forEach(i => selected.push(i));
+  pickBatteryMonitor(input, notes).forEach(i => selected.push(i));
+  pickBms(input, notes, warnings).forEach(i => selected.push(i));
+  pickDcDistribution(input, notes).forEach(i => selected.push(i));
+  pickAlternatorHardware(input, notes).forEach(i => selected.push(i));
+  pickDcLoadsHardware(input, notes).forEach(i => selected.push(i));
+  pickShoreCharger(input, notes).forEach(i => selected.push(i));
+
+  if (input.generators.length) {
+    addNote(notes, `Generatori presenti: ${input.generators.map(g => `${g.name} ${g.kw}kW ${g.voltage}V ${g.phase==='tri'?'trifase':'monofase'}`).join('; ')}.`);
+    checks.push('Verificare corrente limite AC su ingresso generatore in funzione della potenza disponibile.');
+  }
+  if (input.alternators.length) {
+    addNote(notes, `Alternatori presenti: ${input.alternators.map(a => `${a.name} ${a.voltage}V ${a.amps}A → ${labelUsage(a.target)}`).join('; ')}.`);
+    checks.push('Verificare strategia di carica e ripartizione tra banchi servizi e avviamento.');
+  }
+
+  const dataDevices = selected.filter(s => ['mppt','battery_monitor','dcdc','dcdc_stepdown','dcdc_stepthrough'].includes(s.family)).reduce((sum, item) => sum + (item.qty || 1), 0);
+  const gxNode = selected.find(s => s.family === 'gx');
+  const gxPorts = gxNode ? (gxNode.veDirectPorts || 0) : 0;
+  if (gxNode && dataDevices > gxPorts) {
+    selected.push({...PRODUCT_CATALOG.find(p => p.id === 'vedirect_usb'), qty:1, role:'Espansione porte VE.Direct', quoteMode:'show'});
+    warnings.push(`Dispositivi dati stimati: ${dataDevices}; porte native GX: ${gxPorts}. Aggiunta interfaccia VE.Direct to USB.`);
+  }
+
+  if (input.notesExtra) addNote(notes, `Nota progetto: ${input.notesExtra}`);
+
+  return { selected: mergeSameProducts(selected), notes, warnings, checks };
+}
+
+function buildQuoteRows(selected, customerType){
+  const discount = discountRate(customerType);
+  return selected.filter(item => item.quoteMode !== 'hide').map(item => {
+    const supplierCostUnit = getTierCost(item, item.qty);
+    const publicListUnit = publicListFromCost(supplierCostUnit);
+    const netUnitPrice = publicListUnit * (1 - discount);
+    const lineNetTotal = netUnitPrice * item.qty;
+    return {
+      code:item.code, description:item.name, qty:item.qty, role:item.role || '',
+      supplierCostUnit, supplierCostTotal:supplierCostUnit * item.qty, publicListUnit, discountRate:discount,
+      netUnitPrice, lineNetTotal, marginValue:lineNetTotal - (supplierCostUnit * item.qty),
+      marginPercent:lineNetTotal > 0 ? ((lineNetTotal - (supplierCostUnit * item.qty)) / lineNetTotal) : 0
+    };
+  });
+}
+
+function renderConfigSummary(input, config){
+  const relation = [];
+  relation.push(`Il progetto nautico è stato impostato su bus principale ${input.systemVoltage}V con richiesta inverter pari a ${input.inverterPower}VA.`);
+  if (input.batteryBanks.length) relation.push(`Sono stati definiti ${input.batteryBanks.length} banchi batteria con distinzione tra elementi esistenti e nuove forniture.`);
+  if (input.dcLoads.length) relation.push(`Sono presenti ${input.dcLoads.length} utenze DC speciali a tensione dedicata da includere nel progetto tecnico.`);
+
+  document.getElementById('configSummary').innerHTML = `
+    <div style="margin-bottom:10px;">
+      <span class="pill pill-ok">Sistema ${input.systemVoltage}V</span>
+      <span class="pill pill-ok">Cliente ${input.customerType}</span>
+      <span class="pill pill-ok">Inverter richiesto ${input.inverterPower}VA</span>
+      <span class="pill pill-ok">FV ${input.pvPower}W</span>
+      ${config.warnings.length ? `<span class="pill pill-warn">${config.warnings.length} warning</span>` : `<span class="pill pill-ok">Nessun warning critico</span>`}
+    </div>
+
+    <div class="split-note">
+      <div class="note-box">
+        <strong>Relazione tecnica · inquadramento</strong>
+        <ul class="list">${relation.map(n => `<li>${n}</li>`).join('')}</ul>
+      </div>
+      <div class="note-box">
+        <strong>Relazione tecnica · criteri di scelta</strong>
+        ${config.notes.length ? `<ul class="list">${config.notes.map(n => `<li>${n}</li>`).join('')}</ul>` : `<div class="empty">Nessuna nota.</div>`}
+      </div>
+    </div>
+
+    <div class="split-note" style="margin-top:12px;">
+      <div class="note-box">
+        <strong>Warning</strong>
+        ${config.warnings.length ? `<ul class="list">${config.warnings.map(w => `<li>${w}</li>`).join('')}</ul>` : `<div class="empty">Nessun warning tecnico bloccante.</div>`}
+      </div>
+      <div class="note-box">
+        <strong>Controlli consigliati</strong>
+        ${config.checks.length ? `<ul class="list">${config.checks.map(c => `<li>${c}</li>`).join('')}</ul>` : `<div class="empty">Nessun controllo aggiuntivo.</div>`}
+      </div>
+    </div>
+  `;
+}
+
+function renderComponents(selected){
+  const rows = selected.map(item => `
+    <tr>
+      <td class="mono">${item.code}</td>
+      <td>${item.technicalLabel || item.name}<div class="small">${item.role || ''}</div></td>
+      <td>${item.qty}</td>
+      <td>${item.quoteMode === 'hide' ? '<span class="pill pill-warn">Solo progetto tecnico</span>' : '<span class="pill pill-ok">In preventivo</span>'}</td>
+    </tr>
+  `).join('');
+
+  document.getElementById('componentsTable').innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Codice</th><th>Descrizione</th><th>Q.tà</th><th>Visibilità</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderQuote(quoteRows){
+  const productsSubtotal = quoteRows.reduce((s,r)=>s+r.lineNetTotal,0);
+  const designSell = productsSubtotal * 0.02;
+  const shippingSell = productsSubtotal * 0.03;
+  const taxable = productsSubtotal + designSell + shippingSell;
+  const vat = taxable * 0.22;
+  const total = taxable + vat;
+
+  const rows = quoteRows.map(r => `
+    <tr>
+      <td class="mono">${r.code}</td>
+      <td>${r.description}<div class="small">${r.role || ''}</div></td>
+      <td>${r.qty}</td>
+      <td>${euro(r.publicListUnit)}</td>
+      <td>${(r.discountRate * 100).toFixed(0)}%</td>
+      <td>${euro(r.netUnitPrice)}</td>
+      <td>${euro(r.lineNetTotal)}</td>
+    </tr>
+  `).join('');
+
+  document.getElementById('quoteTable').innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Codice</th><th>Descrizione</th><th>Q.tà</th><th>Listino pubblico</th><th>Sconto</th><th>Netto unit.</th><th>Totale netto</th></tr></thead>
+        <tbody>
+          ${rows}
+          <tr><td>SERV-DESIGN</td><td>Progettazione</td><td>1</td><td>—</td><td>—</td><td>${euro(designSell)}</td><td>${euro(designSell)}</td></tr>
+          <tr><td>SERV-SHIP</td><td>Trasporto</td><td>1</td><td>—</td><td>—</td><td>${euro(shippingSell)}</td><td>${euro(shippingSell)}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="totals">
+      <div class="total-row"><span>Subtotale prodotti</span><span>${euro(productsSubtotal)}</span></div>
+      <div class="total-row"><span>Progettazione</span><span>${euro(designSell)}</span></div>
+      <div class="total-row"><span>Trasporto</span><span>${euro(shippingSell)}</span></div>
+      <div class="total-row"><span>Imponibile</span><span>${euro(taxable)}</span></div>
+      <div class="total-row"><span>IVA 22%</span><span>${euro(vat)}</span></div>
+      <div class="total-row"><strong>Totale finale</strong><strong>${euro(total)}</strong></div>
+    </div>
+  `;
+}
+
+function renderInternal(quoteRows, input){
+  const productsSales = quoteRows.reduce((s,r)=>s+r.lineNetTotal,0);
+  const productsCost = quoteRows.reduce((s,r)=>s+r.supplierCostTotal,0);
+  const designSell = productsSales * 0.02;
+  const designCost = input.designHours * input.designHourlyCost;
+  const designMargin = designSell - designCost;
+  const designMarginPct = designSell > 0 ? designMargin / designSell : 0;
+  const shipSell = productsSales * 0.03;
+  const shipCost = input.shippingInternalCost;
+  const shipMargin = shipSell - shipCost;
+  const shipMarginPct = shipSell > 0 ? shipMargin / shipSell : 0;
+  const projectSales = productsSales + designSell + shipSell;
+  const projectCosts = productsCost + designCost + shipCost;
+  const projectMargin = projectSales - projectCosts;
+  const projectMarginPct = projectSales > 0 ? projectMargin / projectSales : 0;
+
+  const rows = quoteRows.map(r => `
+    <tr>
+      <td class="mono">${r.code}</td>
+      <td>${r.description}<div class="small">${r.role || ''}</div></td>
+      <td>${r.qty}</td>
+      <td>${euro(r.supplierCostUnit)}</td>
+      <td>${euro(r.supplierCostTotal)}</td>
+      <td>${euro(r.netUnitPrice)}</td>
+      <td>${euro(r.lineNetTotal)}</td>
+      <td>${euro(r.marginValue)}</td>
+      <td>${(r.marginPercent * 100).toFixed(1)}%</td>
+    </tr>
+  `).join('');
+
+  document.getElementById('internalTable').innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Codice</th><th>Descrizione</th><th>Q.tà</th><th>Costo unit.</th><th>Costo tot.</th><th>Netto unit.</th><th>Netto tot.</th><th>Margine €</th><th>Margine %</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:16px;" class="table-wrap">
+      <table>
+        <thead><tr><th>Servizio</th><th>Vendita</th><th>Costo interno</th><th>Margine €</th><th>Margine %</th></tr></thead>
+        <tbody>
+          <tr><td>Progettazione<div class="small">${input.designHours} h × ${euro(input.designHourlyCost)}</div></td><td>${euro(designSell)}</td><td>${euro(designCost)}</td><td>${euro(designMargin)}</td><td>${(designMarginPct * 100).toFixed(1)}%</td></tr>
+          <tr><td>Trasporto</td><td>${euro(shipSell)}</td><td>${euro(shipCost)}</td><td>${euro(shipMargin)}</td><td>${(shipMarginPct * 100).toFixed(1)}%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="totals">
+      <div class="total-row"><span>Vendita netta totale progetto</span><span>${euro(projectSales)}</span></div>
+      <div class="total-row"><span>Costo interno totale progetto</span><span>${euro(projectCosts)}</span></div>
+      <div class="total-row"><strong>Margine totale €</strong><strong>${euro(projectMargin)}</strong></div>
+      <div class="total-row"><strong>Margine totale %</strong><strong>${(projectMarginPct * 100).toFixed(1)}%</strong></div>
+    </div>
+  `;
+}
+
+function saveProject(){
+  const input = getFormData();
+  localStorage.setItem('victron_nautica_v31_project', JSON.stringify({input}));
+  alert('Progetto V3.1 salvato nel browser.');
+}
+function clearProject(){
+  localStorage.removeItem('victron_nautica_v31_project');
+  alert('Salvataggio cancellato.');
+}
+function loadProject(){
+  const raw = localStorage.getItem('victron_nautica_v31_project');
+  if (!raw) { alert('Nessun progetto V3.1 salvato.'); return; }
+  const { input } = JSON.parse(raw);
+
+  document.getElementById('projectName').value = input.projectName || '';
+  document.getElementById('customerType').value = input.customerType || 'operatore';
+  document.getElementById('systemVoltage').value = String(input.systemVoltage || 24);
+  document.getElementById('inverterPower').value = input.inverterPower || 8000;
+  document.getElementById('pvPower').value = input.pvPower || 1200;
+  document.getElementById('gxChoice').value = input.gxChoice || 'auto';
+  document.getElementById('gxDisplay').value = input.gxDisplay || 'auto';
+  document.getElementById('shoreChargerNeed').value = input.shoreChargerNeed || 'auto';
+  document.getElementById('hasShore').checked = !!input.hasShore;
+  document.getElementById('advancedDc').checked = !!input.advancedDc;
+  document.getElementById('wantMonitoring').checked = !!input.wantMonitoring;
+  document.getElementById('needBatteryMonitor').checked = !!input.needBatteryMonitor;
+  document.getElementById('designHours').value = input.designHours || 4;
+  document.getElementById('designHourlyCost').value = input.designHourlyCost || 20;
+  document.getElementById('shippingInternalCost').value = input.shippingInternalCost || 35;
+  document.getElementById('notesExtra').value = input.notesExtra || '';
+
+  batteryBankIds = [];
+  generatorIds = [];
+  alternatorIds = [];
+  dcLoadIds = [];
+
+  (input.batteryBanks || []).forEach(b => addBatteryBank(b));
+  if (!input.batteryBanks || !input.batteryBanks.length) resetBatteryBanks();
+
+  (input.generators || []).forEach(g => addGenerator(g));
+  if (!input.generators || !input.generators.length) resetGenerators();
+
+  (input.alternators || []).forEach(a => addAlternator(a));
+  if (!input.alternators || !input.alternators.length) resetAlternators();
+
+  (input.dcLoads || []).forEach(l => addDcLoad(l));
+  if (!input.dcLoads || !input.dcLoads.length) resetDcLoads();
+
+  generateProject();
+}
+
+function generateProject(){
+  batteryBankIds.forEach(id => updateBatteryCalc(id));
+  const input = getFormData();
+  const config = buildAutoConfig(input);
+  const quoteRows = buildQuoteRows(config.selected, input.customerType);
+
+  const relation = [];
+  relation.push(`Il progetto nautico è stato impostato su bus principale ${input.systemVoltage}V con richiesta inverter pari a ${input.inverterPower}VA.`);
+  if (input.batteryBanks.length) relation.push(`Sono stati definiti ${input.batteryBanks.length} banchi batteria con distinzione tra elementi esistenti e nuove forniture.`);
+  if (input.dcLoads.length) relation.push(`Sono presenti ${input.dcLoads.length} utenze DC speciali a tensione dedicata da includere nel progetto tecnico.`);
+
+  document.getElementById('configSummary').innerHTML = `
+    <div style="margin-bottom:10px;">
+      <span class="pill pill-ok">Sistema ${input.systemVoltage}V</span>
+      <span class="pill pill-ok">Cliente ${input.customerType}</span>
+      <span class="pill pill-ok">Inverter richiesto ${input.inverterPower}VA</span>
+      <span class="pill pill-ok">FV ${input.pvPower}W</span>
+      ${config.warnings.length ? `<span class="pill pill-warn">${config.warnings.length} warning</span>` : `<span class="pill pill-ok">Nessun warning critico</span>`}
+    </div>
+
+    <div class="split-note">
+      <div class="note-box">
+        <strong>Relazione tecnica · inquadramento</strong>
+        <ul class="list">${relation.map(n => `<li>${n}</li>`).join('')}</ul>
+      </div>
+      <div class="note-box">
+        <strong>Relazione tecnica · criteri di scelta</strong>
+        ${config.notes.length ? `<ul class="list">${config.notes.map(n => `<li>${n}</li>`).join('')}</ul>` : `<div class="empty">Nessuna nota.</div>`}
+      </div>
+    </div>
+
+    <div class="split-note" style="margin-top:12px;">
+      <div class="note-box">
+        <strong>Warning</strong>
+        ${config.warnings.length ? `<ul class="list">${config.warnings.map(w => `<li>${w}</li>`).join('')}</ul>` : `<div class="empty">Nessun warning tecnico bloccante.</div>`}
+      </div>
+      <div class="note-box">
+        <strong>Controlli consigliati</strong>
+        ${config.checks.length ? `<ul class="list">${config.checks.map(c => `<li>${c}</li>`).join('')}</ul>` : `<div class="empty">Nessun controllo aggiuntivo.</div>`}
+      </div>
+    </div>
+  `;
+
+  const rowsComponents = config.selected.map(item => `
+    <tr>
+      <td class="mono">${item.code}</td>
+      <td>${item.technicalLabel || item.name}<div class="small">${item.role || ''}</div></td>
+      <td>${item.qty}</td>
+      <td>${item.quoteMode === 'hide' ? '<span class="pill pill-warn">Solo progetto tecnico</span>' : '<span class="pill pill-ok">In preventivo</span>'}</td>
+    </tr>
+  `).join('');
+  document.getElementById('componentsTable').innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Codice</th><th>Descrizione</th><th>Q.tà</th><th>Visibilità</th></tr></thead>
+        <tbody>${rowsComponents}</tbody>
+      </table>
+    </div>
+  `;
+
+  renderQuote(quoteRows);
+  renderInternal(quoteRows, input);
+  localStorage.setItem('victron_nautica_v31_project', JSON.stringify({input}));
+}
+
+window.onload = () => {
+  resetBatteryBanks();
+  resetGenerators();
+  resetAlternators();
+  resetDcLoads();
+
+  const raw = localStorage.getItem('victron_nautica_v31_project');
+  if (raw) loadProject();
+};
 </script>
-
 </body>
 </html>
