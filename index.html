@@ -3,69 +3,197 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Victron Configurator V3 Nautica</title>
+<title>Victron Configurator V3</title>
 
 <style>
-body {font-family: Arial; background:#eef2f7; margin:0; padding:20px;}
-.card {background:white; padding:15px; margin-bottom:15px; border-radius:12px;}
-button {padding:10px; margin-top:10px; cursor:pointer;}
+body {
+  font-family: -apple-system, Arial;
+  background:#eef2f7;
+  margin:0;
+  padding:20px;
+}
+.container {
+  max-width:900px;
+  margin:auto;
+}
+.card {
+  background:white;
+  padding:20px;
+  margin-bottom:15px;
+  border-radius:14px;
+}
+h1 {margin-bottom:10px;}
+h3 {margin-bottom:10px;}
+
+input, select {
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+
+button {
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:#1976f3;
+  color:white;
+  width:100%;
+  font-weight:bold;
+}
+
+.row {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.table {
+  width:100%;
+  border-collapse:collapse;
+}
+
+.table td {
+  padding:6px;
+  border-bottom:1px solid #eee;
+}
 </style>
 </head>
 
 <body>
 
+<div class="container">
+
 <h1>Victron Configurator V3</h1>
 
 <div class="card">
-<h3>Banchi Batteria</h3>
-<div id="batteryBanks"></div>
-<button onclick="addBattery()">Aggiungi banco</button>
+<h3>Dati impianto</h3>
+
+<label>Tensione sistema</label>
+<select id="voltage">
+<option>12</option>
+<option selected>24</option>
+<option>48</option>
+</select>
+
+<label>Potenza richiesta inverter (VA)</label>
+<input id="power" value="8000">
 </div>
 
 <div class="card">
-<button onclick="generate()">Genera configurazione</button>
+<h3>Banchi batteria</h3>
+<div id="banks"></div>
+<button onclick="addBank()">+ Aggiungi banco</button>
 </div>
 
 <div class="card">
-<h3>Output</h3>
-<div id="output"></div>
+<h3>Utenze DC</h3>
+<div id="loads"></div>
+<button onclick="addLoad()">+ Aggiungi utenza</button>
+</div>
+
+<div class="card">
+<button onclick="calculate()">GENERA CONFIGURATORE</button>
+</div>
+
+<div class="card">
+<h3>Risultato tecnico</h3>
+<div id="tech"></div>
+</div>
+
+<div class="card">
+<h3>Preventivo</h3>
+<div id="quote"></div>
+</div>
+
 </div>
 
 <script>
 
 let banks = [];
+let loads = [];
 
-function addBattery() {
-    let id = Date.now();
-    banks.push(id);
+function addBank() {
+  let id = Date.now();
+  banks.push(id);
 
-    let container = document.getElementById("batteryBanks");
-
-    let div = document.createElement("div");
-    div.id = "bank_" + id;
-
-    div.innerHTML = `
-        <hr>
-        Nome: <input id="name_${id}" value="Banco"><br>
-        Tensione: <input id="volt_${id}" value="24"><br>
-        Ah: <input id="ah_${id}" value="200"><br>
-    `;
-
-    container.appendChild(div);
+  let html = `
+  <div id="b_${id}">
+    <hr>
+    <input id="b_name_${id}" placeholder="Nome banco">
+    <div class="row">
+      <input id="b_volt_${id}" placeholder="Volt singola" value="12">
+      <input id="b_ah_${id}" placeholder="Ah" value="100">
+    </div>
+    <div class="row">
+      <input id="b_series_${id}" placeholder="Serie" value="2">
+      <input id="b_parallel_${id}" placeholder="Parallelo" value="2">
+    </div>
+  </div>`;
+  
+  document.getElementById("banks").innerHTML += html;
 }
 
-function generate() {
-    let text = "";
+function addLoad() {
+  let id = Date.now();
+  loads.push(id);
 
-    banks.forEach(id => {
-        let name = document.getElementById("name_"+id).value;
-        let volt = document.getElementById("volt_"+id).value;
-        let ah = document.getElementById("ah_"+id).value;
+  let html = `
+  <div id="l_${id}">
+    <hr>
+    <input id="l_name_${id}" placeholder="Nome utenza">
+    <div class="row">
+      <input id="l_volt_${id}" placeholder="Volt" value="12">
+      <input id="l_w_${id}" placeholder="Watt" value="100">
+    </div>
+  </div>`;
+  
+  document.getElementById("loads").innerHTML += html;
+}
 
-        text += `<p>${name} → ${volt}V ${ah}Ah</p>`;
-    });
+function calculate() {
 
-    document.getElementById("output").innerHTML = text;
+  let systemV = Number(document.getElementById("voltage").value);
+  let power = Number(document.getElementById("power").value);
+
+  let resultTech = "";
+  let resultQuote = "";
+
+  let inverter = power >= 8000 ? "Quattro 8000" : "MultiPlus 5000";
+
+  resultTech += "<b>Inverter scelto:</b> " + inverter + "<br><br>";
+
+  banks.forEach(id=>{
+    let v = Number(document.getElementById("b_volt_"+id).value);
+    let ah = Number(document.getElementById("b_ah_"+id).value);
+    let s = Number(document.getElementById("b_series_"+id).value);
+    let p = Number(document.getElementById("b_parallel_"+id).value);
+
+    let totV = v*s;
+    let totAh = ah*p;
+
+    resultTech += "Banco: " + totV + "V " + totAh + "Ah<br>";
+  });
+
+  loads.forEach(id=>{
+    let v = Number(document.getElementById("l_volt_"+id).value);
+    let w = Number(document.getElementById("l_w_"+id).value);
+
+    if(v != systemV){
+      resultTech += "Conversione necessaria " + systemV + "V → " + v + "V<br>";
+      resultQuote += "<tr><td>Orion DC-DC</td><td>1</td></tr>";
+    }
+  });
+
+  resultQuote = `
+  <table class="table">
+  <tr><td>Inverter</td><td>1</td></tr>
+  ${resultQuote}
+  </table>`;
+
+  document.getElementById("tech").innerHTML = resultTech;
+  document.getElementById("quote").innerHTML = resultQuote;
 }
 
 </script>
