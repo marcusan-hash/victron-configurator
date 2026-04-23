@@ -6,52 +6,144 @@
 <title>Victron Configurator V11</title>
 
 <style>
-body {font-family: Arial; background:#0b2a4a; color:#fff; margin:0;}
-.container {max-width:1000px; margin:auto; padding:20px;}
-.card {background:#fff; color:#000; border-radius:12px; padding:15px; margin-bottom:15px;}
-input, select {width:100%; padding:6px; margin:4px 0;}
-button {padding:10px; background:#00a3e0; color:#fff; border:none; border-radius:8px; cursor:pointer;}
-.hidden {display:none;}
+body{
+  font-family:Arial;
+  background:linear-gradient(135deg,#0b2a4a,#004d87);
+  margin:0;
+  color:#fff;
+}
+
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:20px;
+}
+
+.card{
+  background:#fff;
+  color:#000;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:16px;
+}
+
+h2{color:#004d87;margin-top:0;}
+
+.row{display:flex;gap:10px;flex-wrap:wrap;}
+.col{flex:1;min-width:150px;}
+
+input,select{
+  width:100%;
+  padding:8px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+button{
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  background:#00a3e0;
+  color:#fff;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+button:hover{background:#007bb5;}
+
+.hidden{display:none;}
+.badge{padding:5px 10px;border-radius:6px;font-size:12px;}
+.green{background:#c8e6c9;}
+.yellow{background:#fff3cd;}
+
 </style>
-
 </head>
-<body>
 
+<body>
 <div class="container">
 
-<h1>⚡ Configuratore Victron V11</h1>
+<h1>⚡ Victron Configurator V11</h1>
 
+<!-- DATI -->
 <div class="card">
-<h2>Dati</h2>
-<input id="power" placeholder="Potenza inverter W" type="number">
-<select id="voltage">
+<h2>Dati Impianto</h2>
+
+<div class="row">
+<div class="col">
+<label>Potenza inverter</label>
+<input id="invPower" type="number">
+</div>
+
+<div class="col">
+<label>Tensione</label>
+<select id="systemVolt">
 <option>12</option>
 <option selected>24</option>
 <option>48</option>
 </select>
 </div>
+</div>
+</div>
 
+<!-- BATTERIE -->
 <div class="card">
 <h2>Batterie</h2>
 <button onclick="addBattery()">+ Banco</button>
 <div id="batteries"></div>
 </div>
 
+<!-- FV -->
 <div class="card">
 <h2>Fotovoltaico</h2>
-<label><input type="checkbox" id="pvEnable" onchange="togglePV()"> Attivo</label>
+
+<label><input type="checkbox" id="pvOn" onchange="togglePV()"> Attivo</label>
 
 <div id="pvBlock" class="hidden">
-<input id="pvPower" placeholder="Potenza pannello">
-<input id="pvVoc" placeholder="Voc pannello">
-<input id="pvNum" placeholder="Numero pannelli" value="1">
+
+<div class="row">
+<div class="col">
+<label>Pannelli</label>
+<input id="pvNum" value="1" type="number" onchange="checkPV()">
+</div>
+
+<div class="col">
+<label>W pannello</label>
+<input id="pvPower" type="number">
+</div>
+
+<div class="col">
+<label>Voc</label>
+<input id="pvVoc" type="number">
 </div>
 </div>
 
+<div class="row" id="pvSeries">
+<div class="col">
+<label>Serie</label>
+<input id="pvS" value="1">
+</div>
+<div class="col">
+<label>Parallelo</label>
+<input id="pvP" value="1">
+</div>
+</div>
+
+</div>
+</div>
+
+<!-- GENERATORI -->
 <div class="card">
-<button onclick="generate()">Genera Configurazione</button>
+<h2>Generatori</h2>
+<button onclick="addGen()">+ Generatore</button>
+<div id="gens"></div>
 </div>
 
+<!-- GENERA -->
+<div class="card">
+<button onclick="generate()">⚡ Genera Configurazione</button>
+</div>
+
+<!-- OUTPUT -->
 <div class="card">
 <h2>Output</h2>
 <div id="output">---</div>
@@ -61,58 +153,78 @@ button {padding:10px; background:#00a3e0; color:#fff; border:none; border-radius
 
 <script>
 
-// -------- FUNZIONI BASE --------
-
-function get(id){ return document.getElementById(id).value }
-function num(id){ return Number(get(id)) || 0 }
+// -------- UTILS --------
+function val(id){return document.getElementById(id).value}
+function num(id){return Number(val(id))||0}
 
 // -------- BATTERIE --------
-
 function addBattery(){
-  const div = document.createElement("div")
-  div.innerHTML = `
-    <input placeholder="Ah" class="ah">
-    <input placeholder="Volt" class="volt" value="12">
+  const d=document.createElement("div")
+  d.className="row"
+  d.innerHTML=`
+    <div class="col"><input placeholder="Ah" class="ah"></div>
+    <div class="col"><input placeholder="Volt" value="12" class="volt"></div>
   `
-  document.getElementById("batteries").appendChild(div)
+  document.getElementById("batteries").appendChild(d)
 }
 
 // -------- FV --------
-
 function togglePV(){
   document.getElementById("pvBlock").classList.toggle("hidden")
 }
 
-// -------- GENERA --------
+function checkPV(){
+  let n=num("pvNum")
+  document.getElementById("pvSeries").style.display=(n>1?"flex":"none")
+}
 
+// -------- GENERATORI --------
+function addGen(){
+  const d=document.createElement("div")
+  d.className="row"
+  d.innerHTML=`
+    <div class="col"><input placeholder="kW" class="kw"></div>
+  `
+  document.getElementById("gens").appendChild(d)
+}
+
+// -------- GENERA --------
 function generate(){
 
-  let out = ""
+  let out=""
 
   // batterie
-  let bats = document.querySelectorAll("#batteries div")
+  let bats=document.querySelectorAll("#batteries .row")
   bats.forEach(b=>{
-    let ah = b.querySelector(".ah").value
-    let v = b.querySelector(".volt").value
-    out += `🔋 ${v}V ${ah}Ah<br>`
+    let ah=b.querySelector(".ah").value
+    let v=b.querySelector(".volt").value
+    out+=`🔋 ${v}V ${ah}Ah<br>`
   })
 
   // FV
-  if(document.getElementById("pvEnable").checked){
-    let p = num("pvPower")
-    let voc = num("pvVoc")
-    let n = num("pvNum")
+  if(document.getElementById("pvOn").checked){
+    let p=num("pvPower")
+    let n=num("pvNum")
+    let voc=num("pvVoc")
+    let s=num("pvS")||1
 
-    out += `☀️ FV ${p*n}W Voc ${voc}<br>`
+    out+=`☀️ FV ${p*n}W Voc ${voc*s}<br>`
   }
 
+  // generatori
+  let gens=document.querySelectorAll("#gens .row")
+  gens.forEach(g=>{
+    let kw=g.querySelector(".kw").value
+    out+=`⚙️ Generatore ${kw}kW<br>`
+  })
+
   // inverter
-  let power = num("power")
-  let volt = get("voltage")
+  let inv=num("invPower")
+  let volt=val("systemVolt")
 
-  out += `<br>⚡ Inverter ${power}W ${volt}V`
+  out+=`<br><b>Inverter ${inv}W ${volt}V</b>`
 
-  document.getElementById("output").innerHTML = out
+  document.getElementById("output").innerHTML=out
 }
 
 </script>
