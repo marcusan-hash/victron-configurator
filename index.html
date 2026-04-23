@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Victron Configurator V11 Rebuild</title>
+<title>Victron Configurator V12.0</title>
 <style>
   :root{
     --victron:#0067b8;
@@ -332,8 +332,8 @@
 <div class="wrap">
 
   <div class="hero">
-    <h1>Victron Configurator V11</h1>
-    <p>Rebuild base grafica corretta · struttura pulita · pulsanti funzionanti.</p>
+    <h1>Victron Configurator V12.0</h1>
+    <p>Base definitiva stabile · file unico · blocchi dinamici affidabili.</p>
   </div>
 
   <div id="statusBar" class="status">Interfaccia pronta.</div>
@@ -343,7 +343,7 @@
     <div class="grid grid-4">
       <div>
         <label for="projectName">Nome progetto</label>
-        <input id="projectName" value="Impianto nautico V11">
+        <input id="projectName" value="Impianto nautico V12.0">
       </div>
       <div>
         <label for="customerType">Tipo cliente</label>
@@ -410,7 +410,6 @@
   <div class="card">
     <h2 class="section-title">Fotovoltaico</h2>
     <label><input type="checkbox" id="enablePV"> Presente impianto FV</label>
-
     <div id="pvBlock" class="hidden" style="margin-top:12px;">
       <label><input type="checkbox" id="samePanels" checked> Pannelli tutti uguali</label>
 
@@ -456,8 +455,7 @@
       <button id="resetGeneratorBtn" type="button" class="ghost">Reset generatori</button>
     </div>
   </div>
-
-  <div class="card">
+    <div class="card">
     <h2 class="section-title">Alternatori</h2>
     <div id="alternatorContainer"></div>
     <div class="btns" style="grid-template-columns:1fr 1fr;">
@@ -532,1041 +530,1138 @@
 
   <div class="card">
     <h2 class="section-title">Schema a blocchi</h2>
-    <div id="schemaView" class="schema-board"><div class="empty">Nessuno schema generato.</div></div>
+    <div id="schemaView" class="schema-board">
+      <div class="empty">Nessuno schema generato.</div>
+    </div>
   </div>
 
 </div>
 
 <script>
 (() => {
-  "use strict";
+"use strict";
 
-  const $ = (id) => document.getElementById(id);
+const $ = (id) => document.getElementById(id);
 
-  const state = {
-    batteryIds: [],
-    generatorIds: [],
-    alternatorIds: [],
-    dcLoadIds: [],
-    project: null
-  };
+const state = {
+  batteryIds: [],
+  generatorIds: [],
+  alternatorIds: [],
+  dcLoadIds: [],
+  project: null
+};
 
-  const PRODUCT_CATALOG = [
-    {id:"phoenix_24_1200", type:"inverter", name:"Phoenix 24/1200", volt:24, power:1200, price:330},
-    {id:"multiplus_24_3000", type:"inverter_charger", name:"MultiPlus-II 24/3000", volt:24, power:3000, price:890},
-    {id:"quattro_24_5000", type:"inverter_charger", name:"Quattro 24/5000", volt:24, power:5000, price:1620},
-    {id:"blue_smart_24_16", type:"charger", name:"Blue Smart IP22 24/16", amp:16, price:175},
-    {id:"smart_ip43_24_25", type:"charger", name:"Smart IP43 24/25", amp:25, price:315},
-    {id:"mppt_100_30", type:"mppt", name:"SmartSolar MPPT 100/30", voc:100, amp:30, price:180},
-    {id:"mppt_150_35", type:"mppt", name:"SmartSolar MPPT 150/35", voc:150, amp:35, price:260},
-    {id:"mppt_150_70", type:"mppt", name:"SmartSolar MPPT 150/70", voc:150, amp:70, price:430},
-    {id:"cyrix", type:"battery_link", name:"Cyrix Battery Combiner", price:85},
-    {id:"orion_xs", type:"dc_dc", name:"Orion XS DC-DC", price:390},
-    {id:"smartshunt", type:"monitor", name:"SmartShunt", price:125},
-    {id:"cerbo", type:"gx", name:"Cerbo GX", price:320},
-    {id:"agm_12_100", type:"battery", name:"Victron AGM 12V 100Ah", chem:"agm", singleVoltage:12, singleAh:100},
-    {id:"gel_12_110", type:"battery", name:"Victron GEL 12V 110Ah", chem:"gel", singleVoltage:12, singleAh:110},
-    {id:"lithium_12_100", type:"battery", name:"Lithium Smart 12.8V 100Ah", chem:"lithium", singleVoltage:12.8, singleAh:100},
-    {id:"lead_12_100", type:"battery", name:"Piombo 12V 100Ah", chem:"lead", singleVoltage:12, singleAh:100}
-  ];
+const PRODUCT_CATALOG = [
+  {id:"phoenix_24_1200", type:"inverter", name:"Phoenix 24/1200", volt:24, power:1200, price:330},
+  {id:"multiplus_24_3000", type:"inverter_charger", name:"MultiPlus-II 24/3000", volt:24, power:3000, price:890},
+  {id:"quattro_24_5000", type:"inverter_charger", name:"Quattro 24/5000", volt:24, power:5000, price:1620},
+  {id:"blue_smart_24_16", type:"charger", name:"Blue Smart IP22 24/16", amp:16, price:175},
+  {id:"smart_ip43_24_25", type:"charger", name:"Smart IP43 24/25", amp:25, price:315},
+  {id:"mppt_100_30", type:"mppt", name:"SmartSolar MPPT 100/30", voc:100, amp:30, price:180},
+  {id:"mppt_150_35", type:"mppt", name:"SmartSolar MPPT 150/35", voc:150, amp:35, price:260},
+  {id:"mppt_150_70", type:"mppt", name:"SmartSolar MPPT 150/70", voc:150, amp:70, price:430},
+  {id:"cyrix", type:"battery_link", name:"Cyrix Battery Combiner", price:85},
+  {id:"orion_xs", type:"dc_dc", name:"Orion XS DC-DC", price:390},
+  {id:"smartshunt", type:"monitor", name:"SmartShunt", price:125},
+  {id:"cerbo", type:"gx", name:"Cerbo GX", price:320},
+  {id:"agm_12_100", type:"battery", name:"Victron AGM 12V 100Ah", chem:"agm", singleVoltage:12, singleAh:100},
+  {id:"gel_12_110", type:"battery", name:"Victron GEL 12V 110Ah", chem:"gel", singleVoltage:12, singleAh:110},
+  {id:"lithium_12_100", type:"battery", name:"Lithium Smart 12.8V 100Ah", chem:"lithium", singleVoltage:12.8, singleAh:100},
+  {id:"lead_12_100", type:"battery", name:"Piombo 12V 100Ah", chem:"lead", singleVoltage:12, singleAh:100}
+];
 
-  function setStatus(msg) {
-    $("statusBar").textContent = msg;
-  }
+const setStatus = (msg) => {
+  $("statusBar").textContent = msg;
+};
 
-  function euro(v) {
-    return new Intl.NumberFormat("it-IT", {style:"currency", currency:"EUR"}).format(Number(v || 0));
-  }
+const euro = (v) => new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR"}).format(Number(v||0));
 
-  function uid(prefix) {
-    return `${prefix}_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
-  }
+const uid = (p) => `${p}_${Date.now()}_${Math.floor(Math.random()*10000)}`;
+  const getVal = (id, fb="") => {
+  const el = $(id);
+  return el ? el.value : fb;
+};
 
-  function getVal(id, fallback="") {
-    const el = $(id);
-    return el ? el.value : fallback;
-  }
+const getNum = (id, fb=0) => {
+  const el = $(id);
+  const n = Number(el ? el.value : fb);
+  return Number.isFinite(n) ? n : fb;
+};
 
-  function getNum(id, fallback=0) {
-    const el = $(id);
-    const n = Number(el ? el.value : fallback);
-    return Number.isFinite(n) ? n : fallback;
-  }
+function batteryOptionsHtml() {
+  return PRODUCT_CATALOG
+    .filter(p => p.type === "battery")
+    .map(p => `<option value="${p.id}" data-v="${p.singleVoltage}" data-ah="${p.singleAh}" data-chem="${p.chem}">${p.name}</option>`)
+    .join("");
+}
 
-  function batteryOptionsHtml() {
-    return PRODUCT_CATALOG
-      .filter(p => p.type === "battery")
-      .map(p => `<option value="${p.id}" data-v="${p.singleVoltage}" data-ah="${p.singleAh}" data-chem="${p.chem}">${p.name}</option>`)
-      .join("");
-  }
+function renderBatteryCard(id, defaults={}) {
+  const wrap = document.createElement("div");
+  wrap.className = "subcard";
+  wrap.id = id;
+  wrap.innerHTML = `
+    <div class="subhead">
+      <strong>Banco batterie</strong>
+      <button type="button" class="ghost" data-action="remove-battery" data-id="${id}" style="width:auto;padding:8px 12px;">Rimuovi</button>
+    </div>
 
-  function renderBatteryCard(id, defaults={}) {
-    const wrap = document.createElement("div");
-    wrap.className = "subcard";
-    wrap.id = id;
-    wrap.innerHTML = `
-      <div class="subhead">
-        <strong>Banco batterie</strong>
-        <button type="button" class="ghost" data-action="remove-battery" data-id="${id}" style="width:auto;padding:8px 12px;">Rimuovi</button>
+    <div class="grid grid-4">
+      <div>
+        <label>Tipo banco</label>
+        <select id="bat_type_${id}">
+          <option value="avviamento" ${defaults.type==="avviamento"?"selected":""}>Avviamento</option>
+          <option value="servizi" ${defaults.type!=="avviamento"?"selected":""}>Servizi</option>
+        </select>
       </div>
 
-      <div class="grid grid-4">
-        <div>
-          <label>Tipo banco</label>
-          <select id="bat_type_${id}">
-            <option value="avviamento" ${defaults.type==="avviamento"?"selected":""}>Avviamento</option>
-            <option value="servizi" ${defaults.type!=="avviamento"?"selected":""}>Servizi</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Esistente / nuova fornitura</label>
-          <select id="bat_new_${id}">
-            <option value="no" ${defaults.isNew?"":"selected"}>Esistente</option>
-            <option value="yes" ${defaults.isNew?"selected":""}>Nuova fornitura</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Tecnologia</label>
-          <select id="bat_chem_${id}">
-            <option value="lead">Piombo</option>
-            <option value="agm" selected>AGM</option>
-            <option value="gel">GEL</option>
-            <option value="lithium">Litio</option>
-          </select>
-        </div>
-
-        <div id="bat_model_wrap_${id}" class="hidden">
-          <label>Modello Victron</label>
-          <select id="bat_model_${id}">
-            <option value="">-- seleziona --</option>
-            ${batteryOptionsHtml()}
-          </select>
-        </div>
-
-        <div>
-          <label>Tensione batteria</label>
-          <input id="bat_volt_${id}" type="number" value="${defaults.volt || 12}">
-        </div>
-
-        <div>
-          <label>Ah batteria</label>
-          <input id="bat_ah_${id}" type="number" value="${defaults.ah || 100}">
-        </div>
-
-        <div>
-          <label>Numero batterie</label>
-          <input id="bat_num_${id}" type="number" value="${defaults.num || 1}">
-        </div>
-
-        <div id="bat_series_wrap_${id}">
-          <label>Serie</label>
-          <input id="bat_s_${id}" type="number" value="${defaults.s || 1}">
-        </div>
-
-        <div id="bat_parallel_wrap_${id}">
-          <label>Parallelo</label>
-          <input id="bat_p_${id}" type="number" value="${defaults.p || 1}">
-        </div>
+      <div>
+        <label>Esistente / nuova fornitura</label>
+        <select id="bat_new_${id}">
+          <option value="no" ${defaults.isNew?"":"selected"}>Esistente</option>
+          <option value="yes" ${defaults.isNew?"selected":""}>Nuova fornitura</option>
+        </select>
       </div>
-    `;
-    $("batteryContainer").appendChild(wrap);
 
-    $("bat_new_" + id).addEventListener("change", () => syncBatteryMode(id));
-    $("bat_model_" + id).addEventListener("change", () => autofillBatteryModel(id));
-    $("bat_num_" + id).addEventListener("input", () => syncBatterySeriesVisibility(id));
-
-    syncBatteryMode(id);
-    syncBatterySeriesVisibility(id);
-  }
-
-  function addBattery(defaults={}) {
-    const id = uid("bat");
-    state.batteryIds.push(id);
-    renderBatteryCard(id, defaults);
-    setStatus("Banco aggiunto.");
-  }
-
-  function removeBattery(id) {
-    state.batteryIds = state.batteryIds.filter(x => x !== id);
-    const el = $(id);
-    if (el) el.remove();
-    setStatus("Banco rimosso.");
-  }
-
-  function resetBatteries() {
-    state.batteryIds = [];
-    $("batteryContainer").innerHTML = "";
-    addBattery({type:"avviamento", isNew:false, volt:12, ah:80, num:1, s:1, p:1});
-    addBattery({type:"servizi", isNew:false, volt:12, ah:100, num:1, s:1, p:1});
-    setStatus("Banchi resettati.");
-  }
-
-  function syncBatteryMode(id) {
-    const isNew = getVal("bat_new_" + id) === "yes";
-    $("bat_model_wrap_" + id).classList.toggle("hidden", !isNew);
-    if (isNew) autofillBatteryModel(id);
-  }
-
-  function autofillBatteryModel(id) {
-    const sel = $("bat_model_" + id);
-    if (!sel || !sel.value) return;
-    const opt = sel.options[sel.selectedIndex];
-    $("bat_volt_" + id).value = opt.dataset.v || 12;
-    $("bat_ah_" + id).value = opt.dataset.ah || 100;
-    $("bat_chem_" + id).value = opt.dataset.chem || "agm";
-  }
-
-  function syncBatterySeriesVisibility(id) {
-    const n = getNum("bat_num_" + id, 1);
-    const show = n > 1;
-    $("bat_series_wrap_" + id).classList.toggle("hidden", !show);
-    $("bat_parallel_wrap_" + id).classList.toggle("hidden", !show);
-    if (!show) {
-      $("bat_s_" + id).value = 1;
-      $("bat_p_" + id).value = 1;
-    }
-  }
-
-  function renderGeneratorCard(id) {
-    const wrap = document.createElement("div");
-    wrap.className = "subcard";
-    wrap.id = id;
-    wrap.innerHTML = `
-      <div class="subhead">
-        <strong>Generatore</strong>
-        <button type="button" class="ghost" data-action="remove-generator" data-id="${id}" style="width:auto;padding:8px 12px;">Rimuovi</button>
+      <div>
+        <label>Tecnologia</label>
+        <select id="bat_chem_${id}">
+          <option value="lead">Piombo</option>
+          <option value="agm" selected>AGM</option>
+          <option value="gel">GEL</option>
+          <option value="lithium">Litio</option>
+        </select>
       </div>
-      <div class="grid grid-3">
-        <div><label>Nome</label><input id="gen_name_${id}" value="Generatore"></div>
-        <div><label>Potenza (kW)</label><input id="gen_kw_${id}" type="number" value="0"></div>
-        <div><label>Tensione AC</label><select id="gen_v_${id}"><option value="230">230V</option><option value="400">400V</option></select></div>
+
+      <div id="bat_model_wrap_${id}" class="hidden">
+        <label>Modello Victron</label>
+        <select id="bat_model_${id}">
+          <option value="">-- seleziona --</option>
+          ${batteryOptionsHtml()}
+        </select>
       </div>
-    `;
-    $("generatorContainer").appendChild(wrap);
-  }
 
-  function addGenerator() {
-    const id = uid("gen");
-    state.generatorIds.push(id);
-    renderGeneratorCard(id);
-    setStatus("Generatore aggiunto.");
-  }
-
-  function removeGenerator(id) {
-    state.generatorIds = state.generatorIds.filter(x => x !== id);
-    const el = $(id);
-    if (el) el.remove();
-    setStatus("Generatore rimosso.");
-  }
-
-  function resetGenerators() {
-    state.generatorIds = [];
-    $("generatorContainer").innerHTML = "";
-    setStatus("Generatori resettati.");
-  }
-
-  function renderAlternatorCard(id) {
-    const wrap = document.createElement("div");
-    wrap.className = "subcard";
-    wrap.id = id;
-    wrap.innerHTML = `
-      <div class="subhead">
-        <strong>Alternatore</strong>
-        <button type="button" class="ghost" data-action="remove-alternator" data-id="${id}" style="width:auto;padding:8px 12px;">Rimuovi</button>
+      <div>
+        <label>Tensione batteria</label>
+        <input id="bat_volt_${id}" type="number" value="${defaults.volt || 12}">
       </div>
-      <div class="grid grid-4">
-        <div><label>Nome</label><input id="alt_name_${id}" value="Alternatore"></div>
-        <div><label>Tensione</label><select id="alt_v_${id}"><option value="12">12V</option><option value="24">24V</option></select></div>
-        <div><label>Corrente max (A)</label><input id="alt_a_${id}" type="number" value="0"></div>
-        <div><label>Carica</label><select id="alt_target_${id}"><option value="servizi">Solo servizi</option><option value="avviamento">Solo avviamento</option><option value="entrambi">Entrambi</option></select></div>
+
+      <div>
+        <label>Ah batteria</label>
+        <input id="bat_ah_${id}" type="number" value="${defaults.ah || 100}">
       </div>
-    `;
-    $("alternatorContainer").appendChild(wrap);
-  }
 
-  function addAlternator() {
-    const id = uid("alt");
-    state.alternatorIds.push(id);
-    renderAlternatorCard(id);
-    setStatus("Alternatore aggiunto.");
-  }
-
-  function removeAlternator(id) {
-    state.alternatorIds = state.alternatorIds.filter(x => x !== id);
-    const el = $(id);
-    if (el) el.remove();
-    setStatus("Alternatore rimosso.");
-  }
-
-  function resetAlternators() {
-    state.alternatorIds = [];
-    $("alternatorContainer").innerHTML = "";
-    setStatus("Alternatori resettati.");
-  }
-
-  function renderDcLoadCard(id) {
-    const wrap = document.createElement("div");
-    wrap.className = "subcard";
-    wrap.id = id;
-    wrap.innerHTML = `
-      <div class="subhead">
-        <strong>Utenza DC speciale</strong>
-        <button type="button" class="ghost" data-action="remove-dcload" data-id="${id}" style="width:auto;padding:8px 12px;">Rimuovi</button>
+      <div>
+        <label>Numero batterie</label>
+        <input id="bat_num_${id}" type="number" value="${defaults.num || 1}">
       </div>
-      <div class="grid grid-3">
-        <div><label>Nome</label><input id="dcl_name_${id}" value="Utenza DC"></div>
-        <div><label>Tensione richiesta</label><select id="dcl_v_${id}"><option value="12">12V</option><option value="24">24V</option><option value="48">48V</option></select></div>
-        <div><label>Potenza (W)</label><input id="dcl_w_${id}" type="number" value="0"></div>
+
+      <div id="bat_series_wrap_${id}">
+        <label>Serie</label>
+        <input id="bat_s_${id}" type="number" value="${defaults.s || 1}">
       </div>
-    `;
-    $("dcLoadContainer").appendChild(wrap);
+
+      <div id="bat_parallel_wrap_${id}">
+        <label>Parallelo</label>
+        <input id="bat_p_${id}" type="number" value="${defaults.p || 1}">
+      </div>
+    </div>
+  `;
+  $("batteryContainer").appendChild(wrap);
+
+  $("bat_new_" + id).addEventListener("change", () => syncBatteryMode(id));
+  $("bat_model_" + id).addEventListener("change", () => autofillBatteryModel(id));
+  $("bat_num_" + id).addEventListener("input", () => syncBatterySeriesVisibility(id));
+
+  syncBatteryMode(id);
+  syncBatterySeriesVisibility(id);
+}
+
+function addBattery(defaults={}) {
+  const id = uid("bat");
+  state.batteryIds.push(id);
+  renderBatteryCard(id, defaults);
+  setStatus("Banco aggiunto.");
+}
+
+function removeBattery(id) {
+  state.batteryIds = state.batteryIds.filter(x => x !== id);
+  const el = $(id);
+  if (el) el.remove();
+  setStatus("Banco rimosso.");
+}
+
+function resetBatteries() {
+  state.batteryIds = [];
+  $("batteryContainer").innerHTML = "";
+  addBattery({type:"avviamento", isNew:false, volt:12, ah:80, num:1, s:1, p:1});
+  addBattery({type:"servizi", isNew:false, volt:12, ah:100, num:1, s:1, p:1});
+  setStatus("Banchi resettati.");
+}
+
+function syncBatteryMode(id) {
+  const isNew = getVal("bat_new_" + id) === "yes";
+  $("bat_model_wrap_" + id).classList.toggle("hidden", !isNew);
+  if (isNew) autofillBatteryModel(id);
+}
+
+function autofillBatteryModel(id) {
+  const sel = $("bat_model_" + id);
+  if (!sel || !sel.value) return;
+  const opt = sel.options[sel.selectedIndex];
+  $("bat_volt_" + id).value = opt.dataset.v || 12;
+  $("bat_ah_" + id).value = opt.dataset.ah || 100;
+  $("bat_chem_" + id).value = opt.dataset.chem || "agm";
+}
+
+function syncBatterySeriesVisibility(id) {
+  const n = getNum("bat_num_" + id, 1);
+  const show = n > 1;
+  $("bat_series_wrap_" + id).classList.toggle("hidden", !show);
+  $("bat_parallel_wrap_" + id).classList.toggle("hidden", !show);
+  if (!show) {
+    $("bat_s_" + id).value = 1;
+    $("bat_p_" + id).value = 1;
+  }
+}
+
+function renderGeneratorCard(id) {
+  const wrap = document.createElement("div");
+  wrap.className = "subcard";
+  wrap.id = id;
+  wrap.innerHTML = `
+    <div class="subhead">
+      <strong>Generatore</strong>
+      <button type="button" class="ghost" data-action="remove-generator" data-id="${id}" style="width:auto;padding:8px 12px;">Rimuovi</button>
+    </div>
+    <div class="grid grid-3">
+      <div>
+        <label>Nome</label>
+        <input id="gen_name_${id}" value="Generatore">
+      </div>
+      <div>
+        <label>Potenza (kW)</label>
+        <input id="gen_kw_${id}" type="number" value="0">
+      </div>
+      <div>
+        <label>Tensione AC</label>
+        <select id="gen_v_${id}">
+          <option value="230">230V</option>
+          <option value="400">400V</option>
+        </select>
+      </div>
+    </div>
+  `;
+  $("generatorContainer").appendChild(wrap);
+}
+
+function addGenerator() {
+  const id = uid("gen");
+  state.generatorIds.push(id);
+  renderGeneratorCard(id);
+  setStatus("Generatore aggiunto.");
+}
+
+function removeGenerator(id) {
+  state.generatorIds = state.generatorIds.filter(x => x !== id);
+  const el = $(id);
+  if (el) el.remove();
+  setStatus("Generatore rimosso.");
+}
+
+function resetGenerators() {
+  state.generatorIds = [];
+  $("generatorContainer").innerHTML = "";
+  setStatus("Generatori resettati.");
+}
+
+function renderAlternatorCard(id) {
+  const wrap = document.createElement("div");
+  wrap.className = "subcard";
+  wrap.id = id;
+  wrap.innerHTML = `
+    <div class="subhead">
+      <strong>Alternatore</strong>
+      <button type="button" class="ghost" data-action="remove-alternator" data-id="${id}" style="width:auto;padding:8px 12px;">Rimuovi</button>
+    </div>
+    <div class="grid grid-4">
+      <div>
+        <label>Nome</label>
+        <input id="alt_name_${id}" value="Alternatore">
+      </div>
+      <div>
+        <label>Tensione</label>
+        <select id="alt_v_${id}">
+          <option value="12">12V</option>
+          <option value="24">24V</option>
+        </select>
+      </div>
+      <div>
+        <label>Corrente max (A)</label>
+        <input id="alt_a_${id}" type="number" value="0">
+      </div>
+      <div>
+        <label>Carica</label>
+        <select id="alt_target_${id}">
+          <option value="servizi">Solo servizi</option>
+          <option value="avviamento">Solo avviamento</option>
+          <option value="entrambi">Entrambi</option>
+        </select>
+      </div>
+    </div>
+  `;
+  $("alternatorContainer").appendChild(wrap);
+}
+
+function addAlternator() {
+  const id = uid("alt");
+  state.alternatorIds.push(id);
+  renderAlternatorCard(id);
+  setStatus("Alternatore aggiunto.");
+}
+
+function removeAlternator(id) {
+  state.alternatorIds = state.alternatorIds.filter(x => x !== id);
+  const el = $(id);
+  if (el) el.remove();
+  setStatus("Alternatore rimosso.");
+}
+
+function resetAlternators() {
+  state.alternatorIds = [];
+  $("alternatorContainer").innerHTML = "";
+  setStatus("Alternatori resettati.");
+}
+
+function renderDcLoadCard(id) {
+  const wrap = document.createElement("div");
+  wrap.className = "subcard";
+  wrap.id = id;
+  wrap.innerHTML = `
+    <div class="subhead">
+      <strong>Utenza DC speciale</strong>
+      <button type="button" class="ghost" data-action="remove-dcload" data-id="${id}" style="width:auto;padding:8px 12px;">Rimuovi</button>
+    </div>
+    <div class="grid grid-3">
+      <div>
+        <label>Nome</label>
+        <input id="dcl_name_${id}" value="Utenza DC">
+      </div>
+      <div>
+        <label>Tensione richiesta</label>
+        <select id="dcl_v_${id}">
+          <option value="12">12V</option>
+          <option value="24">24V</option>
+          <option value="48">48V</option>
+        </select>
+      </div>
+      <div>
+        <label>Potenza (W)</label>
+        <input id="dcl_w_${id}" type="number" value="0">
+      </div>
+    </div>
+  `;
+  $("dcLoadContainer").appendChild(wrap);
+}
+
+function addDcLoad() {
+  const id = uid("dcl");
+  state.dcLoadIds.push(id);
+  renderDcLoadCard(id);
+  setStatus("Utenza DC aggiunta.");
+}
+
+function removeDcLoad(id) {
+  state.dcLoadIds = state.dcLoadIds.filter(x => x !== id);
+  const el = $(id);
+  if (el) el.remove();
+  setStatus("Utenza DC rimossa.");
+}
+
+function resetDcLoads() {
+  state.dcLoadIds = [];
+  $("dcLoadContainer").innerHTML = "";
+  setStatus("Utenze DC resettate.");
+}
+
+function togglePv() {
+  $("pvBlock").classList.toggle("hidden", !$("enablePV").checked);
+  syncPvSeriesVisibility();
+  updatePvSummary();
+  setStatus($("enablePV").checked ? "FV attivato." : "FV disattivato.");
+}
+
+function syncPvSeriesVisibility() {
+  const n = getNum("pv_count", 1);
+  const show = n > 1;
+  $("pvSeriesBlock").classList.toggle("hidden", !show);
+  if (!show) {
+    $("pv_series").value = 1;
+    $("pv_parallel").value = 1;
+  }
+}
+
+function updatePvSummary() {
+  if (!$("enablePV").checked) {
+    $("pvSummary").textContent = "Nessun calcolo FV eseguito.";
+    return;
   }
 
-  function addDcLoad() {
-    const id = uid("dcl");
-    state.dcLoadIds.push(id);
-    renderDcLoadCard(id);
-    setStatus("Utenza DC aggiunta.");
+  const count = getNum("pv_count", 1);
+  const power = getNum("pv_power", 0);
+  const voltage = getNum("pv_voltage", 0);
+  const voc = getNum("pv_voc", 0);
+  let series = getNum("pv_series", 1);
+  let parallel = getNum("pv_parallel", 1);
+
+  if (count === 1) {
+    series = 1;
+    parallel = 1;
   }
 
-  function removeDcLoad(id) {
-    state.dcLoadIds = state.dcLoadIds.filter(x => x !== id);
-    const el = $(id);
-    if (el) el.remove();
-    setStatus("Utenza DC rimossa.");
-  }
+  const totalPower = count * power;
+  const totalVoc = voc * series;
+  const vmppString = voltage * series;
+  const currentString = vmppString > 0 ? ((power * series) / vmppString) : 0;
+  const totalCurrent = currentString * parallel;
 
-  function resetDcLoads() {
-    state.dcLoadIds = [];
-    $("dcLoadContainer").innerHTML = "";
-    setStatus("Utenze DC resettate.");
-  }
+  $("pvSummary").innerHTML =
+    `Totale FV: <b>${totalPower}W</b> · Voc stringa: <b>${totalVoc}V</b> · Corrente campo stimata: <b>${totalCurrent.toFixed(1)}A</b>`;
+}
 
-  function togglePv() {
-    $("pvBlock").classList.toggle("hidden", !$("enablePV").checked);
-    syncPvSeriesVisibility();
-    updatePvSummary();
-    setStatus($("enablePV").checked ? "FV attivato." : "FV disattivato.");
-  }
+function collectBatteries() {
+  return state.batteryIds.map(id => {
+    let num = getNum("bat_num_" + id, 1);
+    let s = getNum("bat_s_" + id, 1);
+    let p = getNum("bat_p_" + id, 1);
 
-  function syncPvSeriesVisibility() {
-    const n = getNum("pv_count", 1);
-    const show = n > 1;
-    $("pvSeriesBlock").classList.toggle("hidden", !show);
-    if (!show) {
-      $("pv_series").value = 1;
-      $("pv_parallel").value = 1;
-    }
-  }
-
-  function updatePvSummary() {
-    if (!$("enablePV").checked) {
-      $("pvSummary").textContent = "Nessun calcolo FV eseguito.";
-      return;
-    }
-
-    const count = getNum("pv_count", 1);
-    const power = getNum("pv_power", 0);
-    const voltage = getNum("pv_voltage", 0);
-    const voc = getNum("pv_voc", 0);
-    let series = getNum("pv_series", 1);
-    let parallel = getNum("pv_parallel", 1);
-
-    if (count === 1) {
-      series = 1;
-      parallel = 1;
-    }
-
-    const totalPower = count * power;
-    const totalVoc = voc * series;
-    const vmppString = voltage * series;
-    const currentString = vmppString > 0 ? ((power * series) / vmppString) : 0;
-    const totalCurrent = currentString * parallel;
-
-    $("pvSummary").innerHTML =
-      `Totale FV: <b>${totalPower}W</b> · Voc stringa: <b>${totalVoc}V</b> · Corrente campo stimata: <b>${totalCurrent.toFixed(1)}A</b>`;
-  }
-
-  function collectBatteries() {
-    return state.batteryIds.map(id => {
-      let num = getNum("bat_num_" + id, 1);
-      let s = getNum("bat_s_" + id, 1);
-      let p = getNum("bat_p_" + id, 1);
-
-      if (num === 1) {
+    if (num === 1) {
+      s = 1;
+      p = 1;
+    } else {
+      if (s === 0 && p > 0) s = 1;
+      if (p === 0 && s > 0) p = 1;
+      if (s === 0 && p === 0) {
         s = 1;
         p = 1;
-      } else {
-        if (s === 0 && p > 0) s = 1;
-        if (p === 0 && s > 0) p = 1;
-        if (s === 0 && p === 0) {
-          s = 1;
-          p = 1;
-        }
       }
-
-      const volt = getNum("bat_volt_" + id, 12);
-      const ah = getNum("bat_ah_" + id, 100);
-
-      return {
-        id,
-        type: getVal("bat_type_" + id),
-        isNew: getVal("bat_new_" + id) === "yes",
-        chem: getVal("bat_chem_" + id),
-        volt,
-        ah,
-        num,
-        s,
-        p,
-        bankVolt: volt * s,
-        bankAh: ah * p
-      };
-    });
-  }
-
-  function collectGenerators() {
-    return state.generatorIds
-      .map(id => ({
-        id,
-        name: getVal("gen_name_" + id),
-        kw: getNum("gen_kw_" + id, 0),
-        voltage: getNum("gen_v_" + id, 230)
-      }))
-      .filter(x => x.kw > 0);
-  }
-
-  function collectAlternators() {
-    return state.alternatorIds
-      .map(id => ({
-        id,
-        name: getVal("alt_name_" + id),
-        voltage: getNum("alt_v_" + id, 12),
-        amps: getNum("alt_a_" + id, 0),
-        target: getVal("alt_target_" + id)
-      }))
-      .filter(x => x.amps > 0);
-  }
-
-  function collectDcLoads() {
-    return state.dcLoadIds
-      .map(id => ({
-        id,
-        name: getVal("dcl_name_" + id),
-        voltage: getNum("dcl_v_" + id, 12),
-        watts: getNum("dcl_w_" + id, 0)
-      }))
-      .filter(x => x.watts > 0);
-  }
-
-  function collectPv() {
-    if (!$("enablePV").checked) return {enabled:false};
-
-    const count = getNum("pv_count", 1);
-    let series = getNum("pv_series", 1);
-    let parallel = getNum("pv_parallel", 1);
-
-    if (count === 1) {
-      series = 1;
-      parallel = 1;
     }
+
+    const volt = getNum("bat_volt_" + id, 12);
+    const ah = getNum("bat_ah_" + id, 100);
 
     return {
-      enabled: true,
-      samePanels: $("samePanels").checked,
-      count,
-      panelPower: getNum("pv_power", 0),
-      panelVoltage: getNum("pv_voltage", 0),
-      voc: getNum("pv_voc", 0),
-      series,
-      parallel,
-      totalPower: count * getNum("pv_power", 0),
-      totalVoc: getNum("pv_voc", 0) * series
+      id,
+      type: getVal("bat_type_" + id),
+      isNew: getVal("bat_new_" + id) === "yes",
+      chem: getVal("bat_chem_" + id),
+      volt,
+      ah,
+      num,
+      s,
+      p,
+      bankVolt: volt * s,
+      bankAh: ah * p
     };
+  });
+}
+
+function collectGenerators() {
+  return state.generatorIds
+    .map(id => ({
+      id,
+      name: getVal("gen_name_" + id),
+      kw: getNum("gen_kw_" + id, 0),
+      voltage: getNum("gen_v_" + id, 230)
+    }))
+    .filter(x => x.kw > 0);
+}
+
+function collectAlternators() {
+  return state.alternatorIds
+    .map(id => ({
+      id,
+      name: getVal("alt_name_" + id),
+      voltage: getNum("alt_v_" + id, 12),
+      amps: getNum("alt_a_" + id, 0),
+      target: getVal("alt_target_" + id)
+    }))
+    .filter(x => x.amps > 0);
+}
+
+function collectDcLoads() {
+  return state.dcLoadIds
+    .map(id => ({
+      id,
+      name: getVal("dcl_name_" + id),
+      voltage: getNum("dcl_v_" + id, 12),
+      watts: getNum("dcl_w_" + id, 0)
+    }))
+    .filter(x => x.watts > 0);
+}
+
+function collectPv() {
+  if (!$("enablePV").checked) return {enabled:false};
+
+  const count = getNum("pv_count", 1);
+  let series = getNum("pv_series", 1);
+  let parallel = getNum("pv_parallel", 1);
+
+  if (count === 1) {
+    series = 1;
+    parallel = 1;
   }
 
-  function explain(product, whyChosen, alternative="", altReason="") {
-    return {...product, whyChosen, alternative, altReason};
+  return {
+    enabled: true,
+    samePanels: $("samePanels").checked,
+    count,
+    panelPower: getNum("pv_power", 0),
+    panelVoltage: getNum("pv_voltage", 0),
+    voc: getNum("pv_voc", 0),
+    series,
+    parallel,
+    totalPower: count * getNum("pv_power", 0),
+    totalVoc: getNum("pv_voc", 0) * series
+  };
+}
+  function buildProject() {
+  const project = {
+    general: {
+      projectName: getVal("projectName"),
+      customerType: getVal("customerType"),
+      systemVoltage: Number(getVal("systemVoltage")),
+      inverterPower: getNum("inverterPower", 0),
+      hasShore: getVal("hasShore"),
+      systemLevel: getVal("systemLevel"),
+      chargeProfile: getVal("chargeProfile"),
+      gxChoice: getVal("gxChoice")
+    },
+    batteries: collectBatteries(),
+    generators: collectGenerators(),
+    alternators: collectAlternators(),
+    dcLoads: collectDcLoads(),
+    pv: collectPv(),
+    warnings: [],
+    infos: []
+  };
+
+  if (!project.batteries.length) project.warnings.push("Nessun banco batteria definito.");
+
+  const service = project.batteries.find(x => x.type === "servizi");
+  if (!service) project.warnings.push("Manca un banco servizi.");
+
+  if (project.pv.enabled && (!project.pv.panelPower || !project.pv.voc || !project.pv.panelVoltage)) {
+    project.warnings.push("Campo FV attivo ma dati minimi incompleti.");
   }
 
-  function chooseInverter(project) {
-    const p = project.general.inverterPower;
-    if (!p) return null;
+  if (project.pv.enabled && project.pv.count > 1 && (project.pv.series * project.pv.parallel !== project.pv.count)) {
+    project.warnings.push("Configurazione FV serie/parallelo incoerente.");
+  }
 
-    if (p <= 1200) {
-      return explain(
-        PRODUCT_CATALOG.find(x => x.id === "phoenix_24_1200"),
-        "Impianto piccolo o medio senza necessità certa di inverter/charger integrato.",
-        "MultiPlus-II 24/3000",
-        "Se serve anche carica integrata importante."
-      );
+  project.batteries.forEach(b => {
+    if (b.num > 1 && (b.s * b.p !== b.num)) {
+      project.warnings.push(`Banco ${b.type}: numero batterie incoerente con serie/parallelo.`);
     }
-
-    if (p <= 3000) {
-      return explain(
-        PRODUCT_CATALOG.find(x => x.id === "multiplus_24_3000"),
-        "Scelto MultiPlus per avere inverter e caricabatterie integrato.",
-        "Phoenix 24/1200",
-        "Se serve solo l'inverter."
-      );
+    if (b.type === "servizi" && b.bankVolt !== project.general.systemVoltage) {
+      project.warnings.push(`Banco servizi ${b.bankVolt}V incoerente con sistema ${project.general.systemVoltage}V.`);
     }
+  });
 
+  return project;
+}
+
+const explain = (product, whyChosen, alternative="", altReason="") => ({
+  ...product,
+  whyChosen,
+  alternative,
+  altReason
+});
+
+function chooseInverter(project) {
+  const p = project.general.inverterPower;
+  if (!p) return null;
+
+  if (p <= 1200) {
     return explain(
-      PRODUCT_CATALOG.find(x => x.id === "quattro_24_5000"),
-      "Scelto Quattro per richieste AC più elevate o architettura più articolata.",
+      PRODUCT_CATALOG.find(x => x.id === "phoenix_24_1200"),
+      "Impianto piccolo o medio senza necessità certa di inverter/charger integrato.",
       "MultiPlus-II 24/3000",
-      "Se la potenza richiesta è più contenuta."
+      "Se serve anche carica integrata importante."
     );
   }
 
-  function chooseCharger(project) {
-    if (project.general.hasShore !== "yes") return null;
-
-    const service = project.batteries.find(x => x.type === "servizi");
-    if (!service) return null;
-
-    if (service.bankAh <= 150) {
-      return explain(
-        PRODUCT_CATALOG.find(x => x.id === "blue_smart_24_16"),
-        "Caricatore coerente con banco servizi medio-piccolo.",
-        "Smart IP43 24/25",
-        "Se il banco cresce o serve una gestione più articolata."
-      );
-    }
-
+  if (p <= 3000) {
     return explain(
-      PRODUCT_CATALOG.find(x => x.id === "smart_ip43_24_25"),
-      "Caricatore scelto per banco servizi più importante e uso più intenso.",
-      "Blue Smart 24/16",
-      "Se il banco è piccolo."
+      PRODUCT_CATALOG.find(x => x.id === "multiplus_24_3000"),
+      "Scelto MultiPlus per avere inverter e caricabatterie integrato.",
+      "Phoenix 24/1200",
+      "Se serve solo l'inverter."
     );
   }
 
-  function chooseMppt(project) {
-    if (!project.pv.enabled) return null;
+  return explain(
+    PRODUCT_CATALOG.find(x => x.id === "quattro_24_5000"),
+    "Scelto Quattro per richieste AC più elevate o architettura più articolata.",
+    "MultiPlus-II 24/3000",
+    "Se la potenza richiesta è più contenuta."
+  );
+}
 
-    const voc = project.pv.totalVoc;
-    const power = project.pv.totalPower;
+function chooseCharger(project) {
+  if (project.general.hasShore !== "yes") return null;
 
-    if (!voc || !power) {
-      return explain(
-        PRODUCT_CATALOG.find(x => x.id === "mppt_100_30"),
-        "Scelta preliminare per dati FV incompleti.",
-        "MPPT 150/35",
-        "Se Voc risultasse più alta."
-      );
-    }
+  const service = project.batteries.find(x => x.type === "servizi");
+  if (!service) return null;
 
-    if (voc < 100 && power <= 600) {
-      return explain(
-        PRODUCT_CATALOG.find(x => x.id === "mppt_100_30"),
-        "Scelto su base Voc e potenza campo.",
-        "MPPT 150/35",
-        "Se il campo cresce."
-      );
-    }
-
-    if (voc <= 150 && power <= 1000) {
-      return explain(
-        PRODUCT_CATALOG.find(x => x.id === "mppt_150_35"),
-        "Scelto per tensione FV più elevata o maggior margine.",
-        "MPPT 100/30",
-        "Se il Voc fosse più basso."
-      );
-    }
-
+  if (service.bankAh <= 150) {
     return explain(
-      PRODUCT_CATALOG.find(x => x.id === "mppt_150_70"),
-      "Scelto per campo FV più importante.",
+      PRODUCT_CATALOG.find(x => x.id === "blue_smart_24_16"),
+      "Caricatore coerente con banco servizi medio-piccolo.",
+      "Smart IP43 24/25",
+      "Se il banco cresce o serve una gestione più articolata."
+    );
+  }
+
+  return explain(
+    PRODUCT_CATALOG.find(x => x.id === "smart_ip43_24_25"),
+    "Caricatore scelto per banco servizi più importante e uso più intenso.",
+    "Blue Smart 24/16",
+    "Se il banco è piccolo."
+  );
+}
+
+function chooseMppt(project) {
+  if (!project.pv.enabled) return null;
+
+  const voc = project.pv.totalVoc;
+  const power = project.pv.totalPower;
+
+  if (!voc || !power) {
+    return explain(
+      PRODUCT_CATALOG.find(x => x.id === "mppt_100_30"),
+      "Scelta preliminare per dati FV incompleti.",
       "MPPT 150/35",
-      "Se il campo fosse più piccolo."
+      "Se Voc risultasse più alta."
     );
   }
 
-  function chooseChargeStrategy(project) {
-    const hasAlternator = project.alternators.length > 0;
-    const hasLithium = project.batteries.some(x => x.chem === "lithium");
+  if (voc < 100 && power <= 600) {
+    return explain(
+      PRODUCT_CATALOG.find(x => x.id === "mppt_100_30"),
+      "Scelto su base Voc e potenza campo.",
+      "MPPT 150/35",
+      "Se il campo cresce."
+    );
+  }
 
-    if (!hasAlternator) return null;
+  if (voc <= 150 && power <= 1000) {
+    return explain(
+      PRODUCT_CATALOG.find(x => x.id === "mppt_150_35"),
+      "Scelto per tensione FV più elevata o maggior margine.",
+      "MPPT 100/30",
+      "Se il Voc fosse più basso."
+    );
+  }
 
-    const alt = project.alternators[0];
-    if (alt.target === "entrambi") {
-      if (hasLithium) {
-        return explain(
-          PRODUCT_CATALOG.find(x => x.id === "orion_xs"),
-          "Alternatore su più banchi con litio: preferibile carica DC-DC controllata.",
-          "Cyrix",
-          "Se si vuole solo combinazione automatica."
-        );
-      }
+  return explain(
+    PRODUCT_CATALOG.find(x => x.id === "mppt_150_70"),
+    "Scelto per campo FV più importante.",
+    "MPPT 150/35",
+    "Se il campo fosse più piccolo."
+  );
+}
 
+function chooseChargeStrategy(project) {
+  const hasAlternator = project.alternators.length > 0;
+  const hasLithium = project.batteries.some(x => x.chem === "lithium");
+
+  if (!hasAlternator) return null;
+
+  const alt = project.alternators[0];
+  if (alt.target === "entrambi") {
+    if (hasLithium) {
       return explain(
-        PRODUCT_CATALOG.find(x => x.id === "cyrix"),
-        "Strategia semplice per combinazione automatica dei banchi.",
-        "Orion XS",
-        "Se serve carica DC-DC controllata."
+        PRODUCT_CATALOG.find(x => x.id === "orion_xs"),
+        "Alternatore su più banchi con litio: preferibile carica DC-DC controllata.",
+        "Cyrix",
+        "Se si vuole solo combinazione automatica."
       );
     }
 
-    return null;
+    return explain(
+      PRODUCT_CATALOG.find(x => x.id === "cyrix"),
+      "Strategia semplice per combinazione automatica dei banchi.",
+      "Orion XS",
+      "Se serve carica DC-DC controllata."
+    );
   }
 
-  function chooseMonitor(project) {
-    if (getVal("gxChoice") === "none") return [];
+  return null;
+}
 
-    const arr = [
+function chooseMonitor(project) {
+  if (project.general.gxChoice === "none") return [];
+
+  const arr = [
+    explain(
+      PRODUCT_CATALOG.find(x => x.id === "smartshunt"),
+      "Monitor batteria consigliato per controllo stato carica."
+    )
+  ];
+
+  if (project.general.gxChoice !== "none") {
+    arr.push(
       explain(
-        PRODUCT_CATALOG.find(x => x.id === "smartshunt"),
-        "Monitor batteria consigliato per controllo stato carica."
+        PRODUCT_CATALOG.find(x => x.id === "cerbo"),
+        "Nodo GX utile per supervisione e futura espandibilità."
       )
-    ];
+    );
+  }
 
-    if (getVal("gxChoice") !== "none") {
-      arr.push(
+  return arr;
+}
+
+function buildComponents(project) {
+  const items = [];
+  const inv = chooseInverter(project); if (inv) items.push(inv);
+  const ch = chooseCharger(project); if (ch) items.push(ch);
+  const mp = chooseMppt(project); if (mp) items.push(mp);
+  const strat = chooseChargeStrategy(project); if (strat) items.push(strat);
+  chooseMonitor(project).forEach(x => items.push(x));
+
+  project.dcLoads.forEach(load => {
+    if (load.voltage !== Number(project.general.systemVoltage)) {
+      items.push(
         explain(
-          PRODUCT_CATALOG.find(x => x.id === "cerbo"),
-          "Nodo GX utile per supervisione e futura espandibilità."
+          PRODUCT_CATALOG.find(x => x.id === "orion_xs"),
+          `Utenza ${load.name} a tensione diversa dal bus principale: richiesta conversione DC-DC.`
         )
       );
     }
+  });
 
-    return arr;
+  return items;
+}
+
+function priceFor(id) {
+  const product = PRODUCT_CATALOG.find(x => x.id === id);
+  return product ? product.price : 0;
+}
+
+function unitSell(cost) {
+  const customer = getVal("customerType", "privato");
+  const discount = customer === "operatore" ? 0.50 : 0.40;
+  const listPrice = cost / 0.375;
+  return listPrice * (1 - discount);
+}
+
+function renderOutput(project, components) {
+  const infoHtml = components.map((c, i) => `
+    <div style="margin-bottom:8px;">
+      🔹 <b>${c.name}</b>
+      <button class="info-btn" type="button" data-info-index="${i}">i</button>
+    </div>
+  `).join("");
+
+  const warnings = project.warnings.map(w => `<span class="pill pill-warn">${w}</span>`).join("");
+  const infos = components.map(c => `<li>${c.name}: ${c.whyChosen}</li>`).join("");
+
+  $("output").innerHTML = `
+    <div style="margin-bottom:12px;">
+      <span class="pill pill-ok">Sistema ${project.general.systemVoltage}V</span>
+      <span class="pill pill-ok">Inverter ${project.general.inverterPower}W</span>
+      <span class="pill pill-ok">FV ${project.pv.enabled ? "presente" : "assente"}</span>
+    </div>
+
+    <div class="split">
+      <div class="note-box">
+        <h3 style="margin-top:0;">Componenti selezionati</h3>
+        ${infoHtml || '<div class="empty">Nessun componente.</div>'}
+      </div>
+
+      <div class="note-box">
+        <h3 style="margin-top:0;">Report tecnico</h3>
+        <ul>${infos || "<li>Nessuna scelta tecnica.</li>"}</ul>
+      </div>
+    </div>
+
+    <div class="note-box" style="margin-top:12px;">
+      <h3 style="margin-top:0;">Warning</h3>
+      ${warnings || '<div class="empty">Nessun warning.</div>'}
+    </div>
+  `;
+
+  document.querySelectorAll("[data-info-index]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const c = components[Number(btn.dataset.infoIndex)];
+      alert(
+        `${c.name}\n\n` +
+        `Perché scelto:\n${c.whyChosen}\n\n` +
+        (c.alternative ? `Alternativa:\n${c.alternative}\n${c.altReason || ""}` : "")
+      );
+    });
+  });
+}
+
+function renderQuotes(components) {
+  const rows = components.map(c => {
+    const cost = priceFor(c.id);
+    const sell = unitSell(cost);
+    return {name:c.name, cost, sell};
+  });
+
+  const designHours = getNum("designHours", 0);
+  const designCostH = getNum("designHourlyCost", 0);
+  const designSellH = getNum("designSellHourly", 0);
+  const shipSell = getNum("shipSell", 0);
+  const shipCost = getNum("shipCost", 0);
+
+  const productsSell = rows.reduce((s, r) => s + r.sell, 0);
+  const productsCost = rows.reduce((s, r) => s + r.cost, 0);
+  const designSell = designHours * designSellH;
+  const designCost = designHours * designCostH;
+  const taxable = productsSell + designSell + shipSell;
+  const vat = taxable * 0.22;
+
+  $("quoteTable").innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Descrizione</th><th>Prezzo unit.</th></tr>
+        </thead>
+        <tbody>
+          ${rows.map(r => `<tr><td>${r.name}</td><td>${euro(r.sell)}</td></tr>`).join("")}
+          <tr><td>Progettazione</td><td>${euro(designSell)}</td></tr>
+          <tr><td>Trasporto</td><td>${euro(shipSell)}</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:12px;">
+      <b>Imponibile:</b> ${euro(taxable)}<br>
+      <b>IVA 22%:</b> ${euro(vat)}<br>
+      <b>Totale finale:</b> ${euro(taxable + vat)}
+    </div>
+  `;
+
+  $("internalTable").innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Descrizione</th><th>Costo</th><th>Vendita</th><th>Margine</th></tr>
+        </thead>
+        <tbody>
+          ${rows.map(r => `<tr><td>${r.name}</td><td>${euro(r.cost)}</td><td>${euro(r.sell)}</td><td>${euro(r.sell-r.cost)}</td></tr>`).join("")}
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:12px;">
+      <b>Progettazione interna:</b> ${euro(designCost)}<br>
+      <b>Progettazione vendita:</b> ${euro(designSell)}<br>
+      <b>Trasporto interno:</b> ${euro(shipCost)}<br>
+      <b>Trasporto vendita:</b> ${euro(shipSell)}<br>
+      <b>Margine totale progetto:</b> ${euro((productsSell + designSell + shipSell) - (productsCost + designCost + shipCost))}
+    </div>
+  `;
+}
+
+function calcCableSection(power, voltage, length) {
+  if (!power || !voltage || !length) return 0;
+  const current = power / voltage;
+  const rho = 0.0175;
+  const drop = voltage * 0.03;
+  const section = (2 * rho * length * current) / drop;
+  const std = [1.5,2.5,4,6,10,16,25,35,50,70];
+  return std.find(s => s >= section) || 70;
+}
+
+function renderCabling(project, components) {
+  const inv = components.find(c => c.type === "inverter" || c.type === "inverter_charger");
+  const ch = components.find(c => c.type === "charger");
+  const mp = components.find(c => c.type === "mppt");
+  const lines = [];
+
+  if (inv) {
+    lines.push({
+      tratta: "Banco servizi → Inverter",
+      sezione: `${calcCableSection(project.general.inverterPower, project.general.systemVoltage, 2)} mm²`,
+      note: "Positivo e negativo coerenti; verificare SmartShunt."
+    });
   }
 
-  function buildComponents(project) {
-    const items = [];
-    const inv = chooseInverter(project); if (inv) items.push(inv);
-    const ch = chooseCharger(project); if (ch) items.push(ch);
-    const mp = chooseMppt(project); if (mp) items.push(mp);
-    const strat = chooseChargeStrategy(project); if (strat) items.push(strat);
-    chooseMonitor(project).forEach(x => items.push(x));
-
-    project.dcLoads.forEach(load => {
-      if (load.voltage !== Number(project.general.systemVoltage)) {
-        items.push(
-          explain(
-            PRODUCT_CATALOG.find(x => x.id === "orion_xs"),
-            `Utenza ${load.name} a tensione diversa dal bus principale: richiesta conversione DC-DC.`
-          )
-        );
-      }
+  if (ch) {
+    lines.push({
+      tratta: "Banchina AC → Caricatore",
+      sezione: "AC da definire",
+      note: "Protezione adeguata."
     });
 
-    return items;
-  }
-
-  function priceFor(id) {
-    const product = PRODUCT_CATALOG.find(x => x.id === id);
-    return product ? product.price : 0;
-  }
-
-  function unitSell(cost) {
-    const customer = getVal("customerType", "privato");
-    const discount = customer === "operatore" ? 0.50 : 0.40;
-    const listPrice = cost / 0.375;
-    return listPrice * (1 - discount);
-  }
-
-  function renderOutput(project, components) {
-    const infoHtml = components.map((c, i) => `
-      <div style="margin-bottom:8px;">
-        🔹 <b>${c.name}</b>
-        <button class="info-btn" type="button" data-info-index="${i}">i</button>
-      </div>
-    `).join("");
-
-    const warnings = project.warnings.map(w => `<span class="pill pill-warn">${w}</span>`).join("");
-    const infos = components.map(c => `<li>${c.name}: ${c.whyChosen}</li>`).join("");
-
-    $("output").innerHTML = `
-      <div style="margin-bottom:12px;">
-        <span class="pill pill-ok">Sistema ${project.general.systemVoltage}V</span>
-        <span class="pill pill-ok">Inverter ${project.general.inverterPower}W</span>
-        <span class="pill pill-ok">FV ${project.pv.enabled ? "presente" : "assente"}</span>
-      </div>
-
-      <div class="split">
-        <div class="note-box">
-          <h3 style="margin-top:0;">Componenti selezionati</h3>
-          ${infoHtml || '<div class="empty">Nessun componente.</div>'}
-        </div>
-
-        <div class="note-box">
-          <h3 style="margin-top:0;">Report tecnico</h3>
-          <ul>${infos || "<li>Nessuna scelta tecnica.</li>"}</ul>
-        </div>
-      </div>
-
-      <div class="note-box" style="margin-top:12px;">
-        <h3 style="margin-top:0;">Warning</h3>
-        ${warnings || '<div class="empty">Nessun warning.</div>'}
-      </div>
-    `;
-
-    document.querySelectorAll("[data-info-index]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const c = components[Number(btn.dataset.infoIndex)];
-        alert(
-          `${c.name}\n\n` +
-          `Perché scelto:\n${c.whyChosen}\n\n` +
-          (c.alternative ? `Alternativa:\n${c.alternative}\n${c.altReason || ""}` : "")
-        );
-      });
+    lines.push({
+      tratta: "Caricatore → Banco servizi",
+      sezione: "6-16 mm²",
+      note: "Da affinare con distanze reali."
     });
   }
 
-  function renderQuotes(components) {
-    const rows = components.map(c => {
-      const cost = priceFor(c.id);
-      const sell = unitSell(cost);
-      return {name:c.name, cost, sell};
+  if (mp) {
+    lines.push({
+      tratta: "Campo FV → MPPT",
+      sezione: "da definire",
+      note: "Basare su corrente stringa."
     });
 
-    const designHours = getNum("designHours", 0);
-    const designCostH = getNum("designHourlyCost", 0);
-    const designSellH = getNum("designSellHourly", 0);
-    const shipSell = getNum("shipSell", 0);
-    const shipCost = getNum("shipCost", 0);
-
-    const productsSell = rows.reduce((s, r) => s + r.sell, 0);
-    const productsCost = rows.reduce((s, r) => s + r.cost, 0);
-    const designSell = designHours * designSellH;
-    const designCost = designHours * designCostH;
-    const taxable = productsSell + designSell + shipSell;
-    const vat = taxable * 0.22;
-
-    $("quoteTable").innerHTML = `
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Descrizione</th><th>Prezzo unit.</th></tr></thead>
-          <tbody>
-            ${rows.map(r => `<tr><td>${r.name}</td><td>${euro(r.sell)}</td></tr>`).join("")}
-            <tr><td>Progettazione</td><td>${euro(designSell)}</td></tr>
-            <tr><td>Trasporto</td><td>${euro(shipSell)}</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div style="margin-top:12px;">
-        <b>Imponibile:</b> ${euro(taxable)}<br>
-        <b>IVA 22%:</b> ${euro(vat)}<br>
-        <b>Totale finale:</b> ${euro(taxable + vat)}
-      </div>
-    `;
-
-    $("internalTable").innerHTML = `
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Descrizione</th><th>Costo</th><th>Vendita</th><th>Margine</th></tr></thead>
-          <tbody>
-            ${rows.map(r => `<tr><td>${r.name}</td><td>${euro(r.cost)}</td><td>${euro(r.sell)}</td><td>${euro(r.sell-r.cost)}</td></tr>`).join("")}
-          </tbody>
-        </table>
-      </div>
-
-      <div style="margin-top:12px;">
-        <b>Progettazione interna:</b> ${euro(designCost)}<br>
-        <b>Progettazione vendita:</b> ${euro(designSell)}<br>
-        <b>Trasporto interno:</b> ${euro(shipCost)}<br>
-        <b>Trasporto vendita:</b> ${euro(shipSell)}<br>
-        <b>Margine totale progetto:</b> ${euro((productsSell + designSell + shipSell) - (productsCost + designCost + shipCost))}
-      </div>
-    `;
+    lines.push({
+      tratta: "MPPT → Banco servizi",
+      sezione: "6-16 mm²",
+      note: "Da affinare con distanze reali."
+    });
   }
 
-  function calcCableSection(power, voltage, length) {
-    if (!power || !voltage || !length) return 0;
-    const current = power / voltage;
-    const rho = 0.0175;
-    const drop = voltage * 0.03;
-    const section = (2 * rho * length * current) / drop;
-    const std = [1.5,2.5,4,6,10,16,25,35,50,70];
-    return std.find(s => s >= section) || 70;
-  }
+  $("cablingTable").innerHTML = lines.length ? `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Tratta</th><th>Sezione</th><th>Note</th></tr>
+        </thead>
+        <tbody>
+          ${lines.map(l => `<tr><td>${l.tratta}</td><td>${l.sezione}</td><td>${l.note}</td></tr>`).join("")}
+        </tbody>
+      </table>
+    </div>
+  ` : '<div class="empty">Nessun cablaggio base.</div>';
+}
 
-  function renderCabling(project, components) {
-    const inv = components.find(c => c.type === "inverter" || c.type === "inverter_charger");
-    const ch = components.find(c => c.type === "charger");
-    const mp = components.find(c => c.type === "mppt");
-    const lines = [];
+function renderSchema(project, components) {
+  const inv = components.find(c => c.type === "inverter" || c.type === "inverter_charger");
+  const ch = components.find(c => c.type === "charger");
+  const mp = components.find(c => c.type === "mppt");
+  const mon = components.find(c => c.type === "monitor");
+  const gx = components.find(c => c.type === "gx");
+  const link = components.find(c => c.type === "battery_link" || c.type === "dc_dc");
 
-    if (inv) {
-      lines.push({
-        tratta: "Banco servizi → Inverter",
-        sezione: `${calcCableSection(project.general.inverterPower, project.general.systemVoltage, 2)} mm²`,
-        note: "Positivo e negativo coerenti; verificare SmartShunt."
-      });
-    }
+  $("schemaView").innerHTML = `
+    <div class="schema-row">
+      ${project.general.hasShore==="yes" ? '<div class="asset-card">Banchina AC</div><div>→</div>' : ''}
+      ${ch ? `<div class="asset-card">${ch.name}</div><div>→</div>` : ''}
+      <div class="asset-card">Banco batterie</div>
+      ${link ? `<div>↔</div><div class="asset-card">${link.name}</div>` : ''}
+      ${inv ? `<div>→</div><div class="asset-card">${inv.name}</div>` : ''}
+    </div>
 
-    if (ch) {
-      lines.push({
-        tratta: "Banchina AC → Caricatore",
-        sezione: "AC da definire",
-        note: "Protezione adeguata."
-      });
-
-      lines.push({
-        tratta: "Caricatore → Banco servizi",
-        sezione: "6-16 mm²",
-        note: "Da affinare con distanze reali."
-      });
-    }
-
-    if (mp) {
-      lines.push({
-        tratta: "Campo FV → MPPT",
-        sezione: "da definire",
-        note: "Basare su corrente stringa."
-      });
-
-      lines.push({
-        tratta: "MPPT → Banco servizi",
-        sezione: "6-16 mm²",
-        note: "Da affinare con distanze reali."
-      });
-    }
-
-    $("cablingTable").innerHTML = lines.length ? `
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Tratta</th><th>Sezione</th><th>Note</th></tr></thead>
-          <tbody>
-            ${lines.map(l => `<tr><td>${l.tratta}</td><td>${l.sezione}</td><td>${l.note}</td></tr>`).join("")}
-          </tbody>
-        </table>
-      </div>
-    ` : '<div class="empty">Nessun cablaggio base.</div>';
-  }
-
-  function renderSchema(project, components) {
-    const inv = components.find(c => c.type === "inverter" || c.type === "inverter_charger");
-    const ch = components.find(c => c.type === "charger");
-    const mp = components.find(c => c.type === "mppt");
-    const mon = components.find(c => c.type === "monitor");
-    const gx = components.find(c => c.type === "gx");
-    const link = components.find(c => c.type === "battery_link" || c.type === "dc_dc");
-
-    $("schemaView").innerHTML = `
-      <div class="schema-row">
-        ${project.general.hasShore === "yes" ? '<div class="asset-card">Banchina AC</div><div>→</div>' : ''}
-        ${ch ? `<div class="asset-card">${ch.name}</div><div>→</div>` : ''}
-        <div class="asset-card">Banco batterie</div>
-        ${link ? `<div>↔</div><div class="asset-card">${link.name}</div>` : ''}
-        ${inv ? `<div>→</div><div class="asset-card">${inv.name}</div>` : ''}
-      </div>
-
-      ${mp ? `
+    ${mp ? `
       <div class="schema-row">
         <div class="asset-card">Campo FV</div>
         <div>→</div>
         <div class="asset-card">${mp.name}</div>
         <div>→</div>
         <div class="asset-card">Banco batterie</div>
-      </div>` : ''}
+      </div>
+    ` : ''}
 
-      ${(mon || gx) ? `
+    ${(mon || gx) ? `
       <div class="schema-row">
         ${mon ? `<div class="asset-card">${mon.name}</div>` : ''}
         ${gx ? `<div class="asset-card">${gx.name}</div>` : ''}
-      </div>` : ''}
-    `;
-  }
+      </div>
+    ` : ''}
+  `;
+}
 
-  function generate() {
-    try {
-      updatePvSummary();
-
-      const project = buildProject();
-      const components = buildComponents(project);
-
-      state.project = project;
-
-      renderOutput(project, components);
-      renderQuotes(components);
-      renderCabling(project, components);
-      renderSchema(project, components);
-
-      setStatus("Configurazione generata.");
-    } catch (err) {
-      console.error(err);
-      setStatus("Errore durante la generazione.");
-      alert("Errore JS durante la generazione: " + err.message);
-    }
-  }
-
-  function saveProject() {
-    const snapshot = {
-      general: {
-        projectName: getVal("projectName"),
-        customerType: getVal("customerType"),
-        systemVoltage: getVal("systemVoltage"),
-        inverterPower: getVal("inverterPower"),
-        hasShore: getVal("hasShore"),
-        systemLevel: getVal("systemLevel"),
-        chargeProfile: getVal("chargeProfile"),
-        gxChoice: getVal("gxChoice"),
-        designHours: getVal("designHours"),
-        designHourlyCost: getVal("designHourlyCost"),
-        designSellHourly: getVal("designSellHourly"),
-        shipSell: getVal("shipSell"),
-        shipCost: getVal("shipCost")
-      },
-      pv: {
-        enablePV: $("enablePV").checked,
-        samePanels: $("samePanels").checked,
-        pv_count: getVal("pv_count"),
-        pv_power: getVal("pv_power"),
-        pv_voltage: getVal("pv_voltage"),
-        pv_voc: getVal("pv_voc"),
-        pv_series: getVal("pv_series"),
-        pv_parallel: getVal("pv_parallel")
-      },
-      batteries: collectBatteries(),
-      generators: collectGenerators(),
-      alternators: collectAlternators(),
-      dcLoads: collectDcLoads()
-    };
-
-    localStorage.setItem("victron_v11_rebuild", JSON.stringify(snapshot));
-    setStatus("Progetto salvato.");
-  }
-
-  function loadProject() {
-    const raw = localStorage.getItem("victron_v11_rebuild");
-    if (!raw) {
-      alert("Nessun progetto salvato.");
-      return;
-    }
-
-    const data = JSON.parse(raw);
-
-    Object.entries(data.general || {}).forEach(([k, v]) => {
-      if ($(k)) $(k).value = v;
-    });
-
-    $("enablePV").checked = !!data.pv?.enablePV;
-    $("samePanels").checked = !!data.pv?.samePanels;
-
-    ["pv_count","pv_power","pv_voltage","pv_voc","pv_series","pv_parallel"].forEach(k => {
-      if ($(k) && data.pv && k in data.pv) $(k).value = data.pv[k];
-    });
-
-    togglePv();
-
-    state.batteryIds = [];
-    $("batteryContainer").innerHTML = "";
-    (data.batteries || []).forEach(b => addBattery({
-      type: b.type,
-      isNew: b.isNew,
-      volt: b.volt,
-      ah: b.ah,
-      num: b.num,
-      s: b.s,
-      p: b.p
-    }));
-
-    resetGenerators();
-    (data.generators || []).forEach(g => {
-      addGenerator();
-      const id = state.generatorIds[state.generatorIds.length - 1];
-      $("gen_name_" + id).value = g.name;
-      $("gen_kw_" + id).value = g.kw;
-      $("gen_v_" + id).value = g.voltage;
-    });
-
-    resetAlternators();
-    (data.alternators || []).forEach(a => {
-      addAlternator();
-      const id = state.alternatorIds[state.alternatorIds.length - 1];
-      $("alt_name_" + id).value = a.name;
-      $("alt_v_" + id).value = a.voltage;
-      $("alt_a_" + id).value = a.amps;
-      $("alt_target_" + id).value = a.target;
-    });
-
-    resetDcLoads();
-    (data.dcLoads || []).forEach(l => {
-      addDcLoad();
-      const id = state.dcLoadIds[state.dcLoadIds.length - 1];
-      $("dcl_name_" + id).value = l.name;
-      $("dcl_v_" + id).value = l.voltage;
-      $("dcl_w_" + id).value = l.watts;
-    });
-
+function generate() {
+  try {
     updatePvSummary();
-    setStatus("Progetto caricato.");
+
+    const project = buildProject();
+    const components = buildComponents(project);
+
+    state.project = project;
+
+    renderOutput(project, components);
+    renderQuotes(components);
+    renderCabling(project, components);
+    renderSchema(project, components);
+
+    setStatus("Configurazione generata.");
+  } catch (err) {
+    console.error(err);
+    setStatus("Errore durante la generazione.");
+    alert("Errore JS durante la generazione: " + err.message);
+  }
+}
+
+function saveProject() {
+  const snapshot = {
+    general: {
+      projectName: getVal("projectName"),
+      customerType: getVal("customerType"),
+      systemVoltage: getVal("systemVoltage"),
+      inverterPower: getVal("inverterPower"),
+      hasShore: getVal("hasShore"),
+      systemLevel: getVal("systemLevel"),
+      chargeProfile: getVal("chargeProfile"),
+      gxChoice: getVal("gxChoice"),
+      designHours: getVal("designHours"),
+      designHourlyCost: getVal("designHourlyCost"),
+      designSellHourly: getVal("designSellHourly"),
+      shipSell: getVal("shipSell"),
+      shipCost: getVal("shipCost")
+    },
+    pv: {
+      enablePV: $("enablePV").checked,
+      samePanels: $("samePanels").checked,
+      pv_count: getVal("pv_count"),
+      pv_power: getVal("pv_power"),
+      pv_voltage: getVal("pv_voltage"),
+      pv_voc: getVal("pv_voc"),
+      pv_series: getVal("pv_series"),
+      pv_parallel: getVal("pv_parallel")
+    },
+    batteries: collectBatteries(),
+    generators: collectGenerators(),
+    alternators: collectAlternators(),
+    dcLoads: collectDcLoads()
+  };
+
+  localStorage.setItem("victron_v12_stable", JSON.stringify(snapshot));
+  setStatus("Progetto salvato.");
+}
+
+function loadProject() {
+  const raw = localStorage.getItem("victron_v12_stable");
+  if (!raw) {
+    alert("Nessun progetto salvato.");
+    return;
   }
 
-  function exportPdf() {
-    const w = window.open("", "_blank");
-    w.document.write(`
-      <html>
-        <head>
-          <title>Victron Configurator PDF</title>
-          <style>
-            body{font-family:Arial;padding:20px}
-            table{border-collapse:collapse;width:100%}
-            th,td{border:1px solid #ccc;padding:6px}
-          </style>
-        </head>
-        <body>${document.body.innerHTML}</body>
-      </html>
-    `);
-    w.document.close();
-    w.print();
-    setStatus("Export PDF avviato.");
-  }
+  const data = JSON.parse(raw);
 
-  function handleDelegatedClicks(e) {
-    const btn = e.target.closest("button[data-action]");
-    if (!btn) return;
+  Object.entries(data.general || {}).forEach(([k, v]) => {
+    if ($(k)) $(k).value = v;
+  });
 
-    const action = btn.dataset.action;
-    const id = btn.dataset.id;
+  $("enablePV").checked = !!data.pv?.enablePV;
+  $("samePanels").checked = !!data.pv?.samePanels;
 
-    if (action === "remove-battery") removeBattery(id);
-    if (action === "remove-generator") removeGenerator(id);
-    if (action === "remove-alternator") removeAlternator(id);
-    if (action === "remove-dcload") removeDcLoad(id);
-  }
+  ["pv_count","pv_power","pv_voltage","pv_voc","pv_series","pv_parallel"].forEach(k => {
+    if ($(k) && data.pv && k in data.pv) $(k).value = data.pv[k];
+  });
 
-  function init() {
-    document.addEventListener("click", handleDelegatedClicks);
+  togglePv();
 
-    $("addBatteryBtn").addEventListener("click", () => addBattery());
-    $("resetBatteryBtn").addEventListener("click", resetBatteries);
-    $("addGeneratorBtn").addEventListener("click", addGenerator);
-    $("resetGeneratorBtn").addEventListener("click", resetGenerators);
-    $("addAlternatorBtn").addEventListener("click", addAlternator);
-    $("resetAlternatorBtn").addEventListener("click", resetAlternators);
-    $("addDcLoadBtn").addEventListener("click", addDcLoad);
-    $("resetDcLoadBtn").addEventListener("click", resetDcLoads);
-    $("generateBtn").addEventListener("click", generate);
-    $("saveBtn").addEventListener("click", saveProject);
-    $("loadBtn").addEventListener("click", loadProject);
-    $("pdfBtn").addEventListener("click", exportPdf);
+  state.batteryIds = [];
+  $("batteryContainer").innerHTML = "";
+  (data.batteries || []).forEach(b => addBattery({
+    type: b.type,
+    isNew: b.isNew,
+    volt: b.volt,
+    ah: b.ah,
+    num: b.num,
+    s: b.s,
+    p: b.p
+  }));
 
-    $("enablePV").addEventListener("change", togglePv);
-    $("pv_count").addEventListener("input", () => {
-      syncPvSeriesVisibility();
-      updatePvSummary();
-    });
+  resetGenerators();
+  (data.generators || []).forEach(g => {
+    addGenerator();
+    const id = state.generatorIds[state.generatorIds.length - 1];
+    $("gen_name_" + id).value = g.name;
+    $("gen_kw_" + id).value = g.kw;
+    $("gen_v_" + id).value = g.voltage;
+  });
 
-    ["pv_power","pv_voltage","pv_voc","pv_series","pv_parallel"].forEach(id => {
-      $(id).addEventListener("input", updatePvSummary);
-    });
+  resetAlternators();
+  (data.alternators || []).forEach(a => {
+    addAlternator();
+    const id = state.alternatorIds[state.alternatorIds.length - 1];
+    $("alt_name_" + id).value = a.name;
+    $("alt_v_" + id).value = a.voltage;
+    $("alt_a_" + id).value = a.amps;
+    $("alt_target_" + id).value = a.target;
+  });
 
-    resetBatteries();
-    resetGenerators();
-    resetAlternators();
-    resetDcLoads();
-    togglePv();
+  resetDcLoads();
+  (data.dcLoads || []).forEach(l => {
+    addDcLoad();
+    const id = state.dcLoadIds[state.dcLoadIds.length - 1];
+    $("dcl_name_" + id).value = l.name;
+    $("dcl_v_" + id).value = l.voltage;
+    $("dcl_w_" + id).value = l.watts;
+  });
 
-    setStatus("Interfaccia inizializzata.");
-  }
+  updatePvSummary();
+  setStatus("Progetto caricato.");
+}
 
-  window.addEventListener("DOMContentLoaded", init);
+function exportPdf() {
+  const w = window.open("", "_blank");
+  w.document.write(`
+    <html>
+      <head>
+        <title>Victron Configurator PDF</title>
+        <style>
+          body{font-family:Arial;padding:20px}
+          table{border-collapse:collapse;width:100%}
+          th,td{border:1px solid #ccc;padding:6px}
+        </style>
+      </head>
+      <body>${document.body.innerHTML}</body>
+    </html>
+  `);
+  w.document.close();
+  w.print();
+  setStatus("Export PDF avviato.");
+}
+
+function handleDelegatedClicks(e) {
+  const btn = e.target.closest("button[data-action]");
+  if (!btn) return;
+
+  const action = btn.dataset.action;
+  const id = btn.dataset.id;
+
+  if (action === "remove-battery") removeBattery(id);
+  if (action === "remove-generator") removeGenerator(id);
+  if (action === "remove-alternator") removeAlternator(id);
+  if (action === "remove-dcload") removeDcLoad(id);
+}
+
+function init() {
+  document.addEventListener("click", handleDelegatedClicks);
+
+  $("addBatteryBtn").addEventListener("click", () => addBattery());
+  $("resetBatteryBtn").addEventListener("click", resetBatteries);
+  $("addGeneratorBtn").addEventListener("click", addGenerator);
+  $("resetGeneratorBtn").addEventListener("click", resetGenerators);
+  $("addAlternatorBtn").addEventListener("click", addAlternator);
+  $("resetAlternatorBtn").addEventListener("click", resetAlternators);
+  $("addDcLoadBtn").addEventListener("click", addDcLoad);
+  $("resetDcLoadBtn").addEventListener("click", resetDcLoads);
+  $("generateBtn").addEventListener("click", generate);
+  $("saveBtn").addEventListener("click", saveProject);
+  $("loadBtn").addEventListener("click", loadProject);
+  $("pdfBtn").addEventListener("click", exportPdf);
+
+  $("enablePV").addEventListener("change", togglePv);
+  $("pv_count").addEventListener("input", () => {
+    syncPvSeriesVisibility();
+    updatePvSummary();
+  });
+
+  ["pv_power","pv_voltage","pv_voc","pv_series","pv_parallel"].forEach(id => {
+    $(id).addEventListener("input", updatePvSummary);
+  });
+
+  resetBatteries();
+  resetGenerators();
+  resetAlternators();
+  resetDcLoads();
+  togglePv();
+
+  setStatus("Interfaccia inizializzata.");
+}
+
+window.addEventListener("DOMContentLoaded", init);
 })();
 </script>
 </body>
