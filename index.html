@@ -3,337 +3,339 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Victron Configurator V12.0</title>
+<title>Victron Configurator V12.2</title>
+
 <style>
-  :root{
-    --victron:#0067b8;
-    --victron-dark:#004d87;
-    --bg:#eef4fa;
-    --card:#ffffff;
-    --text:#1a2430;
-    --muted:#66788a;
-    --line:#d8e3ee;
-    --green:#0f9d58;
-    --orange:#d97706;
-    --red:#c62828;
-    --shadow:0 10px 26px rgba(8,32,64,.10);
-    --radius:20px;
-  }
+:root{
+  --victron:#0067b8;
+  --victron-dark:#004d87;
+  --bg:#eef4fa;
+  --card:#ffffff;
+  --text:#1a2430;
+  --muted:#66788a;
+  --line:#d8e3ee;
+  --green:#0f9d58;
+  --orange:#d97706;
+  --red:#c62828;
+  --shadow:0 10px 26px rgba(8,32,64,.10);
+  --radius:20px;
+}
 
-  *{box-sizing:border-box}
+*{box-sizing:border-box}
 
-  body{
-    margin:0;
-    color:var(--text);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-    background:
-      linear-gradient(135deg, rgba(0,103,184,.10), rgba(0,77,135,.04)),
-      radial-gradient(circle at top right, rgba(0,103,184,.16), transparent 28%),
-      radial-gradient(circle at bottom left, rgba(0,77,135,.10), transparent 25%),
-      linear-gradient(180deg,#0c2f57,#0a3768);
-    min-height:100vh;
-    padding:18px;
-  }
+body{
+  margin:0;
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:
+    linear-gradient(135deg, rgba(0,103,184,.10), rgba(0,77,135,.04)),
+    radial-gradient(circle at top right, rgba(0,103,184,.16), transparent 28%),
+    radial-gradient(circle at bottom left, rgba(0,77,135,.10), transparent 25%),
+    linear-gradient(180deg,#0c2f57,#0a3768);
+  min-height:100vh;
+  padding:18px;
+}
 
-  .wrap{
-    max-width:1250px;
-    margin:0 auto;
-  }
+.wrap{
+  max-width:1250px;
+  margin:0 auto;
+}
 
-  .hero{
-    background:linear-gradient(135deg,var(--victron),var(--victron-dark));
-    color:#fff;
-    border-radius:28px;
-    padding:26px 24px 22px;
-    box-shadow:var(--shadow);
-    margin-bottom:18px;
-    position:relative;
-    overflow:hidden;
-  }
+.hero{
+  background:linear-gradient(135deg,var(--victron),var(--victron-dark));
+  color:#fff;
+  border-radius:28px;
+  padding:26px 24px 22px;
+  box-shadow:var(--shadow);
+  margin-bottom:18px;
+  position:relative;
+  overflow:hidden;
+}
 
-  .hero:after{
-    content:"";
-    position:absolute;
-    right:-60px;
-    top:-40px;
-    width:240px;
-    height:240px;
-    border-radius:50%;
-    background:rgba(255,255,255,.08);
-  }
+.hero:after{
+  content:"";
+  position:absolute;
+  right:-60px;
+  top:-40px;
+  width:240px;
+  height:240px;
+  border-radius:50%;
+  background:rgba(255,255,255,.08);
+}
 
-  .hero h1{
-    margin:0 0 8px;
-    font-size:34px;
-    line-height:1.1;
-  }
+.hero h1{
+  margin:0 0 8px;
+  font-size:34px;
+  line-height:1.1;
+}
 
-  .hero p{
-    margin:0;
-    opacity:.95;
-  }
+.hero p{
+  margin:0;
+  opacity:.95;
+}
 
-  .status{
-    padding:12px 14px;
-    border-radius:14px;
-    background:#eef7ff;
-    color:#0b4e8a;
-    border:1px solid #cfe5fb;
-    margin-bottom:16px;
-    box-shadow:var(--shadow);
-  }
+.status{
+  padding:12px 14px;
+  border-radius:14px;
+  background:#eef7ff;
+  color:#0b4e8a;
+  border:1px solid #cfe5fb;
+  margin-bottom:16px;
+  box-shadow:var(--shadow);
+}
 
-  .card{
-    background:var(--card);
-    border-radius:var(--radius);
-    padding:18px;
-    margin-bottom:16px;
-    box-shadow:var(--shadow);
-    overflow:hidden;
-  }
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:18px;
+  margin-bottom:16px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
 
-  .section-title{
-    margin:0 0 14px;
-    font-size:22px;
-    color:#14508e;
-  }
+.section-title{
+  margin:0 0 14px;
+  font-size:22px;
+  color:#14508e;
+}
 
-  .grid{
-    display:grid;
-    grid-template-columns:1fr;
-    gap:12px;
-  }
+.grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
 
-  @media(min-width:860px){
-    .grid-2{grid-template-columns:1fr 1fr}
-    .grid-3{grid-template-columns:1fr 1fr 1fr}
-    .grid-4{grid-template-columns:1fr 1fr 1fr 1fr}
-  }
+@media(min-width:860px){
+  .grid-2{grid-template-columns:1fr 1fr}
+  .grid-3{grid-template-columns:1fr 1fr 1fr}
+  .grid-4{grid-template-columns:1fr 1fr 1fr 1fr}
+}
 
-  label{
-    display:block;
-    font-size:14px;
-    font-weight:700;
-    margin-bottom:6px;
-  }
+label{
+  display:block;
+  font-size:14px;
+  font-weight:700;
+  margin-bottom:6px;
+}
 
-  input,select,textarea{
-    width:100%;
-    padding:12px;
-    border:1px solid var(--line);
-    border-radius:14px;
-    font-size:15px;
-    background:#fff;
-  }
+input,select,textarea{
+  width:100%;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  font-size:15px;
+  background:#fff;
+}
 
-  input[readonly]{
-    background:#f6f8fb;
-    color:#6d7f90;
-  }
+button{
+  border:none;
+  background:var(--victron);
+  color:#fff;
+  padding:13px 16px;
+  border-radius:14px;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+}
 
-  button{
-    border:none;
-    background:var(--victron);
-    color:#fff;
-    padding:13px 16px;
-    border-radius:14px;
-    font-size:15px;
-    font-weight:700;
-    cursor:pointer;
-  }
+button.secondary{
+  background:#eaf3ff;
+  color:var(--victron-dark);
+}
 
-  button.secondary{
-    background:#eaf3ff;
-    color:var(--victron-dark);
-  }
+button.ghost{
+  background:#eef3f7;
+  color:#263544;
+}
 
-  button.ghost{
-    background:#eef3f7;
-    color:#263544;
-  }
+.btns{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  margin-top:14px;
+}
 
-  button.warn{
-    background:#fff2e8;
-    color:#9a3412;
-  }
-
+@media(min-width:700px){
   .btns{
-    display:grid;
-    grid-template-columns:1fr;
-    gap:10px;
-    margin-top:14px;
+    grid-template-columns:1fr 1fr 1fr 1fr;
   }
+}
 
-  @media(min-width:700px){
-    .btns{
-      grid-template-columns:1fr 1fr 1fr 1fr;
-    }
-  }
+.subcard{
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:14px;
+  background:#fbfdff;
+  margin-bottom:12px;
+}
 
-  .subcard{
-    border:1px solid var(--line);
-    border-radius:16px;
-    padding:14px;
-    background:#fbfdff;
-    margin-bottom:12px;
-  }
+.subhead{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+}
 
-  .subhead{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
-    margin-bottom:10px;
-  }
+.subhead strong{
+  font-size:16px;
+}
 
-  .subhead strong{
-    font-size:16px;
-  }
+.small{
+  font-size:13px;
+  color:var(--muted);
+}
 
-  .small{
-    font-size:13px;
-    color:var(--muted);
-  }
+.hidden{
+  display:none !important;
+}
 
-  .hidden{
-    display:none !important;
-  }
+.empty{
+  color:var(--muted);
+  font-style:italic;
+}
 
-  .empty{
-    color:var(--muted);
-    font-style:italic;
-  }
+.pill{
+  display:inline-block;
+  border-radius:999px;
+  padding:5px 10px;
+  font-size:12px;
+  font-weight:700;
+  margin-right:6px;
+  margin-bottom:6px;
+}
 
-  .pill{
-    display:inline-block;
-    border-radius:999px;
-    padding:5px 10px;
-    font-size:12px;
-    font-weight:700;
-    margin-right:6px;
-    margin-bottom:6px;
-  }
+.pill-ok{
+  background:#e8f7ef;
+  color:var(--green);
+}
 
-  .pill-ok{
-    background:#e8f7ef;
-    color:var(--green);
-  }
+.pill-warn{
+  background:#fff4e5;
+  color:var(--orange);
+}
 
-  .pill-warn{
-    background:#fff4e5;
-    color:var(--orange);
-  }
+.pill-bad{
+  background:#fdecec;
+  color:var(--red);
+}
 
-  .pill-bad{
-    background:#fdecec;
-    color:var(--red);
-  }
+.table-wrap{
+  width:100%;
+  overflow-x:auto;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#fff;
+}
 
-  .table-wrap{
-    width:100%;
-    overflow-x:auto;
-    border:1px solid var(--line);
-    border-radius:14px;
-    background:#fff;
-  }
+table{
+  width:100%;
+  min-width:950px;
+  border-collapse:collapse;
+  font-size:14px;
+}
 
-  table{
-    width:100%;
-    min-width:950px;
-    border-collapse:collapse;
-    font-size:14px;
-  }
+th,td{
+  text-align:left;
+  padding:10px 8px;
+  border-bottom:1px solid var(--line);
+  vertical-align:top;
+}
 
-  th,td{
-    text-align:left;
-    padding:10px 8px;
-    border-bottom:1px solid var(--line);
-    vertical-align:top;
-  }
+th{
+  color:var(--muted);
+  font-size:13px;
+  font-weight:700;
+  background:#f8fbfe;
+}
 
-  th{
-    color:var(--muted);
-    font-size:13px;
-    font-weight:700;
-    background:#f8fbfe;
-  }
+.note-box{
+  border:1px dashed var(--line);
+  border-radius:14px;
+  padding:12px;
+  background:#fbfdff;
+}
 
-  .note-box{
-    border:1px dashed var(--line);
-    border-radius:14px;
-    padding:12px;
-    background:#fbfdff;
-  }
+.split{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
 
+@media(min-width:980px){
   .split{
-    display:grid;
-    grid-template-columns:1fr;
-    gap:12px;
+    grid-template-columns:1fr 1fr;
   }
+}
 
-  @media(min-width:980px){
-    .split{
-      grid-template-columns:1fr 1fr;
-    }
-  }
+.schema-board{
+  background:linear-gradient(180deg,#f8fbff,#f0f6fb);
+  border:1px solid #d9e6f2;
+  border-radius:20px;
+  padding:18px;
+  overflow:auto;
+}
 
-  .schema-board{
-    background:linear-gradient(180deg,#f8fbff,#f0f6fb);
-    border:1px solid #d9e6f2;
-    border-radius:20px;
-    padding:18px;
-    overflow:auto;
-  }
+.schema-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  align-items:center;
+  margin-bottom:12px;
+}
 
-  .schema-row{
-    display:flex;
-    flex-wrap:wrap;
-    gap:12px;
-    align-items:center;
-    margin-bottom:12px;
-  }
+.asset-card{
+  background:#fff;
+  border-radius:16px;
+  border:2px solid #dbe7f2;
+  box-shadow:0 10px 18px rgba(0,0,0,.05);
+  padding:12px;
+  min-width:170px;
+  min-height:110px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  font-weight:700;
+}
 
-  .asset-card{
-    background:#fff;
-    border-radius:16px;
-    border:2px solid #dbe7f2;
-    box-shadow:0 10px 18px rgba(0,0,0,.05);
-    padding:12px;
-    min-width:170px;
-    min-height:110px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    font-weight:700;
-  }
+.info-btn{
+  border:none;
+  background:#eaf3ff;
+  color:#004d87;
+  border-radius:50%;
+  width:24px;
+  height:24px;
+  cursor:pointer;
+  padding:0;
+  font-weight:700;
+  line-height:24px;
+  margin-left:8px;
+}
 
-  .info-btn{
-    border:none;
-    background:#eaf3ff;
-    color:#004d87;
-    border-radius:50%;
-    width:24px;
-    height:24px;
-    cursor:pointer;
-    padding:0;
-    font-weight:700;
-    line-height:24px;
-    margin-left:8px;
-  }
+.route-card{
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px;
+  margin-bottom:10px;
+  background:#fbfdff;
+}
 
-  .mono{
-    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-    font-size:12px;
-  }
+.route-title{
+  font-weight:800;
+  color:#004d87;
+  margin-bottom:8px;
+}
+
 </style>
 </head>
+
 <body>
 <div class="wrap">
 
   <div class="hero">
-    <h1>Victron Configurator V12.0</h1>
-    <p>Base definitiva stabile · file unico · blocchi dinamici affidabili.</p>
+    <h1>Victron Configurator V12.2</h1>
+    <p>Motore tecnico + tratte cablaggio dinamiche dopo la configurazione.</p>
   </div>
 
   <div id="statusBar" class="status">Interfaccia pronta.</div>
@@ -343,8 +345,9 @@
     <div class="grid grid-4">
       <div>
         <label for="projectName">Nome progetto</label>
-        <input id="projectName" value="Impianto nautico V12.0">
+        <input id="projectName" value="Impianto nautico V12.2">
       </div>
+
       <div>
         <label for="customerType">Tipo cliente</label>
         <select id="customerType">
@@ -352,6 +355,7 @@
           <option value="privato">Privato</option>
         </select>
       </div>
+
       <div>
         <label for="systemVoltage">Tensione sistema</label>
         <select id="systemVoltage">
@@ -360,10 +364,12 @@
           <option value="48">48V</option>
         </select>
       </div>
+
       <div>
-        <label for="inverterPower">Potenza inverter (W)</label>
+        <label for="inverterPower">Potenza inverter richiesta (W)</label>
         <input id="inverterPower" type="number" value="1200">
       </div>
+
       <div>
         <label for="hasShore">Banchina AC presente</label>
         <select id="hasShore">
@@ -371,6 +377,7 @@
           <option value="no">No</option>
         </select>
       </div>
+
       <div>
         <label for="systemLevel">Livello impianto</label>
         <select id="systemLevel">
@@ -379,6 +386,7 @@
           <option value="avanzato">Avanzato</option>
         </select>
       </div>
+
       <div>
         <label for="chargeProfile">Profilo carica</label>
         <select id="chargeProfile">
@@ -387,6 +395,7 @@
           <option value="fast">Fast</option>
         </select>
       </div>
+
       <div>
         <label for="gxChoice">Monitoraggio / controllo</label>
         <select id="gxChoice">
@@ -397,8 +406,7 @@
       </div>
     </div>
   </div>
-
-  <div class="card">
+    <div class="card">
     <h2 class="section-title">Banchi batterie</h2>
     <div id="batteryContainer"></div>
     <div class="btns" style="grid-template-columns:1fr 1fr;">
@@ -409,41 +417,56 @@
 
   <div class="card">
     <h2 class="section-title">Fotovoltaico</h2>
-    <label><input type="checkbox" id="enablePV"> Presente impianto FV</label>
+
+    <label>
+      <input type="checkbox" id="enablePV">
+      Presente impianto FV
+    </label>
+
     <div id="pvBlock" class="hidden" style="margin-top:12px;">
-      <label><input type="checkbox" id="samePanels" checked> Pannelli tutti uguali</label>
+
+      <label>
+        <input type="checkbox" id="samePanels" checked>
+        Pannelli tutti uguali
+      </label>
 
       <div class="grid grid-4" style="margin-top:12px;">
         <div>
-          <label for="pv_count">Numero pannelli</label>
+          <label>Numero pannelli</label>
           <input id="pv_count" type="number" value="1">
         </div>
+
         <div>
-          <label for="pv_power">Potenza singolo pannello (W)</label>
+          <label>Potenza singolo pannello (W)</label>
           <input id="pv_power" type="number" value="200">
         </div>
+
         <div>
-          <label for="pv_voltage">Voltaggio pannello / Vmpp (V)</label>
+          <label>Vmpp pannello (V)</label>
           <input id="pv_voltage" type="number" value="18">
         </div>
+
         <div>
-          <label for="pv_voc">Voc pannello (V)</label>
+          <label>Voc pannello (V)</label>
           <input id="pv_voc" type="number" value="22">
         </div>
       </div>
 
       <div id="pvSeriesBlock" class="grid grid-2" style="margin-top:12px;">
         <div>
-          <label for="pv_series">Pannelli in serie</label>
+          <label>Pannelli in serie</label>
           <input id="pv_series" type="number" value="1">
         </div>
+
         <div>
-          <label for="pv_parallel">Stringhe in parallelo</label>
+          <label>Stringhe in parallelo</label>
           <input id="pv_parallel" type="number" value="1">
         </div>
       </div>
 
-      <div id="pvSummary" class="small" style="margin-top:12px;">Nessun calcolo FV eseguito.</div>
+      <div id="pvSummary" class="small" style="margin-top:12px;">
+        Nessun calcolo FV eseguito.
+      </div>
     </div>
   </div>
 
@@ -455,7 +478,8 @@
       <button id="resetGeneratorBtn" type="button" class="ghost">Reset generatori</button>
     </div>
   </div>
-    <div class="card">
+
+  <div class="card">
     <h2 class="section-title">Alternatori</h2>
     <div id="alternatorContainer"></div>
     <div class="btns" style="grid-template-columns:1fr 1fr;">
@@ -477,23 +501,27 @@
     <h2 class="section-title">Costi e servizi</h2>
     <div class="grid grid-4">
       <div>
-        <label for="designHours">Ore progettazione</label>
+        <label>Ore progettazione</label>
         <input id="designHours" type="number" value="4">
       </div>
+
       <div>
-        <label for="designHourlyCost">Costo interno orario</label>
+        <label>Costo interno orario</label>
         <input id="designHourlyCost" type="number" value="20">
       </div>
+
       <div>
-        <label for="designSellHourly">Tariffa vendita oraria</label>
+        <label>Tariffa vendita oraria</label>
         <input id="designSellHourly" type="number" value="60">
       </div>
+
       <div>
-        <label for="shipSell">Trasporto vendita</label>
+        <label>Trasporto vendita</label>
         <input id="shipSell" type="number" value="120">
       </div>
+
       <div>
-        <label for="shipCost">Trasporto interno</label>
+        <label>Trasporto interno</label>
         <input id="shipCost" type="number" value="35">
       </div>
     </div>
@@ -505,6 +533,16 @@
       <button id="saveBtn" type="button" class="secondary">Salva progetto</button>
       <button id="loadBtn" type="button" class="ghost">Carica progetto</button>
       <button id="pdfBtn" type="button" class="ghost">Esporta PDF</button>
+    </div>
+  </div>
+
+  <!-- NUOVO BLOCCO CABLAGGI DINAMICO -->
+  <div id="cablingInputCard" class="card hidden">
+    <h2 class="section-title">Distanze cablaggi (step 2)</h2>
+    <div id="cablingInput"></div>
+
+    <div class="btns" style="grid-template-columns:1fr;">
+      <button id="calcCablesBtn" type="button">Calcola sezioni cavi</button>
     </div>
   </div>
 
@@ -524,8 +562,8 @@
   </div>
 
   <div class="card">
-    <h2 class="section-title">Cablaggi base</h2>
-    <div id="cablingTable" class="empty">Nessun cablaggio generato.</div>
+    <h2 class="section-title">Cablaggi</h2>
+    <div id="cablingTable" class="empty">Nessun cablaggio calcolato.</div>
   </div>
 
   <div class="card">
@@ -548,22 +586,27 @@ const state = {
   generatorIds: [],
   alternatorIds: [],
   dcLoadIds: [],
-  project: null
+  project: null,
+  cablingRoutes: []
 };
-
-const PRODUCT_CATALOG = [
+  const PRODUCT_CATALOG = [
   {id:"phoenix_24_1200", type:"inverter", name:"Phoenix 24/1200", volt:24, power:1200, price:330},
   {id:"multiplus_24_3000", type:"inverter_charger", name:"MultiPlus-II 24/3000", volt:24, power:3000, price:890},
   {id:"quattro_24_5000", type:"inverter_charger", name:"Quattro 24/5000", volt:24, power:5000, price:1620},
+
   {id:"blue_smart_24_16", type:"charger", name:"Blue Smart IP22 24/16", amp:16, price:175},
   {id:"smart_ip43_24_25", type:"charger", name:"Smart IP43 24/25", amp:25, price:315},
+
   {id:"mppt_100_30", type:"mppt", name:"SmartSolar MPPT 100/30", voc:100, amp:30, price:180},
   {id:"mppt_150_35", type:"mppt", name:"SmartSolar MPPT 150/35", voc:150, amp:35, price:260},
   {id:"mppt_150_70", type:"mppt", name:"SmartSolar MPPT 150/70", voc:150, amp:70, price:430},
+
   {id:"cyrix", type:"battery_link", name:"Cyrix Battery Combiner", price:85},
   {id:"orion_xs", type:"dc_dc", name:"Orion XS DC-DC", price:390},
+
   {id:"smartshunt", type:"monitor", name:"SmartShunt", price:125},
   {id:"cerbo", type:"gx", name:"Cerbo GX", price:320},
+
   {id:"agm_12_100", type:"battery", name:"Victron AGM 12V 100Ah", chem:"agm", singleVoltage:12, singleAh:100},
   {id:"gel_12_110", type:"battery", name:"Victron GEL 12V 110Ah", chem:"gel", singleVoltage:12, singleAh:110},
   {id:"lithium_12_100", type:"battery", name:"Lithium Smart 12.8V 100Ah", chem:"lithium", singleVoltage:12.8, singleAh:100},
@@ -574,10 +617,14 @@ const setStatus = (msg) => {
   $("statusBar").textContent = msg;
 };
 
-const euro = (v) => new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR"}).format(Number(v||0));
+const euro = (v) => new Intl.NumberFormat("it-IT", {
+  style:"currency",
+  currency:"EUR"
+}).format(Number(v || 0));
 
 const uid = (p) => `${p}_${Date.now()}_${Math.floor(Math.random()*10000)}`;
-  const getVal = (id, fb="") => {
+
+const getVal = (id, fb="") => {
   const el = $(id);
   return el ? el.value : fb;
 };
@@ -599,6 +646,7 @@ function renderBatteryCard(id, defaults={}) {
   const wrap = document.createElement("div");
   wrap.className = "subcard";
   wrap.id = id;
+
   wrap.innerHTML = `
     <div class="subhead">
       <strong>Banco batterie</strong>
@@ -666,6 +714,7 @@ function renderBatteryCard(id, defaults={}) {
       </div>
     </div>
   `;
+
   $("batteryContainer").appendChild(wrap);
 
   $("bat_new_" + id).addEventListener("change", () => syncBatteryMode(id));
@@ -707,6 +756,7 @@ function syncBatteryMode(id) {
 function autofillBatteryModel(id) {
   const sel = $("bat_model_" + id);
   if (!sel || !sel.value) return;
+
   const opt = sel.options[sel.selectedIndex];
   $("bat_volt_" + id).value = opt.dataset.v || 12;
   $("bat_ah_" + id).value = opt.dataset.ah || 100;
@@ -718,6 +768,7 @@ function syncBatterySeriesVisibility(id) {
   const show = n > 1;
   $("bat_series_wrap_" + id).classList.toggle("hidden", !show);
   $("bat_parallel_wrap_" + id).classList.toggle("hidden", !show);
+
   if (!show) {
     $("bat_s_" + id).value = 1;
     $("bat_p_" + id).value = 1;
@@ -728,20 +779,24 @@ function renderGeneratorCard(id) {
   const wrap = document.createElement("div");
   wrap.className = "subcard";
   wrap.id = id;
+
   wrap.innerHTML = `
     <div class="subhead">
       <strong>Generatore</strong>
       <button type="button" class="ghost" data-action="remove-generator" data-id="${id}" style="width:auto;padding:8px 12px;">Rimuovi</button>
     </div>
+
     <div class="grid grid-3">
       <div>
         <label>Nome</label>
         <input id="gen_name_${id}" value="Generatore">
       </div>
+
       <div>
         <label>Potenza (kW)</label>
         <input id="gen_kw_${id}" type="number" value="0">
       </div>
+
       <div>
         <label>Tensione AC</label>
         <select id="gen_v_${id}">
@@ -751,6 +806,7 @@ function renderGeneratorCard(id) {
       </div>
     </div>
   `;
+
   $("generatorContainer").appendChild(wrap);
 }
 
@@ -778,16 +834,19 @@ function renderAlternatorCard(id) {
   const wrap = document.createElement("div");
   wrap.className = "subcard";
   wrap.id = id;
+
   wrap.innerHTML = `
     <div class="subhead">
       <strong>Alternatore</strong>
       <button type="button" class="ghost" data-action="remove-alternator" data-id="${id}" style="width:auto;padding:8px 12px;">Rimuovi</button>
     </div>
+
     <div class="grid grid-4">
       <div>
         <label>Nome</label>
         <input id="alt_name_${id}" value="Alternatore">
       </div>
+
       <div>
         <label>Tensione</label>
         <select id="alt_v_${id}">
@@ -795,10 +854,12 @@ function renderAlternatorCard(id) {
           <option value="24">24V</option>
         </select>
       </div>
+
       <div>
         <label>Corrente max (A)</label>
         <input id="alt_a_${id}" type="number" value="0">
       </div>
+
       <div>
         <label>Carica</label>
         <select id="alt_target_${id}">
@@ -809,6 +870,7 @@ function renderAlternatorCard(id) {
       </div>
     </div>
   `;
+
   $("alternatorContainer").appendChild(wrap);
 }
 
@@ -831,21 +893,23 @@ function resetAlternators() {
   $("alternatorContainer").innerHTML = "";
   setStatus("Alternatori resettati.");
 }
-
-function renderDcLoadCard(id) {
+  function renderDcLoadCard(id) {
   const wrap = document.createElement("div");
   wrap.className = "subcard";
   wrap.id = id;
+
   wrap.innerHTML = `
     <div class="subhead">
       <strong>Utenza DC speciale</strong>
       <button type="button" class="ghost" data-action="remove-dcload" data-id="${id}" style="width:auto;padding:8px 12px;">Rimuovi</button>
     </div>
+
     <div class="grid grid-3">
       <div>
         <label>Nome</label>
         <input id="dcl_name_${id}" value="Utenza DC">
       </div>
+
       <div>
         <label>Tensione richiesta</label>
         <select id="dcl_v_${id}">
@@ -854,12 +918,14 @@ function renderDcLoadCard(id) {
           <option value="48">48V</option>
         </select>
       </div>
+
       <div>
         <label>Potenza (W)</label>
         <input id="dcl_w_${id}" type="number" value="0">
       </div>
     </div>
   `;
+
   $("dcLoadContainer").appendChild(wrap);
 }
 
@@ -893,7 +959,9 @@ function togglePv() {
 function syncPvSeriesVisibility() {
   const n = getNum("pv_count", 1);
   const show = n > 1;
+
   $("pvSeriesBlock").classList.toggle("hidden", !show);
+
   if (!show) {
     $("pv_series").value = 1;
     $("pv_parallel").value = 1;
@@ -960,7 +1028,8 @@ function collectBatteries() {
       s,
       p,
       bankVolt: volt * s,
-      bankAh: ah * p
+      bankAh: ah * p,
+      bankWh: volt * s * ah * p
     };
   });
 }
@@ -1024,7 +1093,8 @@ function collectPv() {
     totalVoc: getNum("pv_voc", 0) * series
   };
 }
-  function buildProject() {
+
+function buildProject() {
   const project = {
     general: {
       projectName: getVal("projectName"),
@@ -1045,10 +1115,21 @@ function collectPv() {
     infos: []
   };
 
-  if (!project.batteries.length) project.warnings.push("Nessun banco batteria definito.");
+  if (!project.batteries.length) {
+    project.warnings.push("Nessun banco batteria definito.");
+  }
 
   const service = project.batteries.find(x => x.type === "servizi");
-  if (!service) project.warnings.push("Manca un banco servizi.");
+  if (!service) {
+    project.warnings.push("Manca un banco servizi.");
+  }
+
+  if (service && project.general.inverterPower > 0) {
+    const ratio = project.general.inverterPower / (service.bankWh || 1);
+    if (ratio > 1.5) {
+      project.warnings.push("Inverter probabilmente sovradimensionato rispetto al banco servizi.");
+    }
+  }
 
   if (project.pv.enabled && (!project.pv.panelPower || !project.pv.voc || !project.pv.panelVoltage)) {
     project.warnings.push("Campo FV attivo ma dati minimi incompleti.");
@@ -1058,14 +1139,23 @@ function collectPv() {
     project.warnings.push("Configurazione FV serie/parallelo incoerente.");
   }
 
+  if (project.pv.enabled && project.pv.totalVoc > 150) {
+    project.warnings.push("Voc FV elevato: verificare compatibilità regolatore.");
+  }
+
   project.batteries.forEach(b => {
     if (b.num > 1 && (b.s * b.p !== b.num)) {
       project.warnings.push(`Banco ${b.type}: numero batterie incoerente con serie/parallelo.`);
     }
+
     if (b.type === "servizi" && b.bankVolt !== project.general.systemVoltage) {
       project.warnings.push(`Banco servizi ${b.bankVolt}V incoerente con sistema ${project.general.systemVoltage}V.`);
     }
   });
+
+  if (project.alternators.length && !project.batteries.length) {
+    project.warnings.push("Alternatore presente senza banchi batteria definiti.");
+  }
 
   return project;
 }
@@ -1135,64 +1225,68 @@ function chooseMppt(project) {
 
   const voc = project.pv.totalVoc;
   const power = project.pv.totalPower;
+  const systemV = project.general.systemVoltage;
 
   if (!voc || !power) {
+    project.warnings.push("MPPT selezionato in modalità preliminare per dati FV incompleti.");
     return explain(
       PRODUCT_CATALOG.find(x => x.id === "mppt_100_30"),
-      "Scelta preliminare per dati FV incompleti.",
+      "Selezione preliminare in assenza di dati FV completi.",
       "MPPT 150/35",
-      "Se Voc risultasse più alta."
+      "Se il Voc o la potenza risultano superiori."
     );
   }
 
-  if (voc < 100 && power <= 600) {
+  const chargeCurrent = power / systemV;
+
+  if (voc <= 100 && chargeCurrent <= 30) {
     return explain(
       PRODUCT_CATALOG.find(x => x.id === "mppt_100_30"),
-      "Scelto su base Voc e potenza campo.",
+      "Voc e corrente di carica stimata compatibili con MPPT 100/30.",
       "MPPT 150/35",
-      "Se il campo cresce."
+      "Se serve maggiore margine sul lato FV."
     );
   }
 
-  if (voc <= 150 && power <= 1000) {
+  if (voc <= 150 && chargeCurrent <= 35) {
     return explain(
       PRODUCT_CATALOG.find(x => x.id === "mppt_150_35"),
-      "Scelto per tensione FV più elevata o maggior margine.",
+      "Voc più alto: necessario regolatore con ingresso FV a 150V.",
       "MPPT 100/30",
-      "Se il Voc fosse più basso."
+      "Non sufficiente se il Voc supera i limiti."
     );
   }
 
   return explain(
     PRODUCT_CATALOG.find(x => x.id === "mppt_150_70"),
-    "Scelto per campo FV più importante.",
+    "Campo FV importante: necessario regolatore di taglia superiore.",
     "MPPT 150/35",
-    "Se il campo fosse più piccolo."
+    "Se il campo FV fosse più piccolo."
   );
 }
 
 function chooseChargeStrategy(project) {
   const hasAlternator = project.alternators.length > 0;
-  const hasLithium = project.batteries.some(x => x.chem === "lithium");
-
   if (!hasAlternator) return null;
 
   const alt = project.alternators[0];
+  const hasLithium = project.batteries.some(b => b.chem === "lithium");
+
   if (alt.target === "entrambi") {
     if (hasLithium) {
       return explain(
         PRODUCT_CATALOG.find(x => x.id === "orion_xs"),
-        "Alternatore su più banchi con litio: preferibile carica DC-DC controllata.",
+        "Sistema multi-banco con litio: preferibile carica DC-DC controllata da alternatore.",
         "Cyrix",
-        "Se si vuole solo combinazione automatica."
+        "Meno adatto quando serve una carica controllata per litio."
       );
     }
 
     return explain(
       PRODUCT_CATALOG.find(x => x.id === "cyrix"),
-      "Strategia semplice per combinazione automatica dei banchi.",
+      "Sistema semplice: combinazione automatica dei banchi da alternatore.",
       "Orion XS",
-      "Se serve carica DC-DC controllata."
+      "Preferibile se serve carica DC-DC controllata."
     );
   }
 
@@ -1205,7 +1299,7 @@ function chooseMonitor(project) {
   const arr = [
     explain(
       PRODUCT_CATALOG.find(x => x.id === "smartshunt"),
-      "Monitor batteria consigliato per controllo stato carica."
+      "Monitor batteria consigliato per controllo dello stato di carica."
     )
   ];
 
@@ -1213,7 +1307,7 @@ function chooseMonitor(project) {
     arr.push(
       explain(
         PRODUCT_CATALOG.find(x => x.id === "cerbo"),
-        "Nodo GX utile per supervisione e futura espandibilità."
+        "Nodo GX utile per supervisione, controllo e futura espandibilità."
       )
     );
   }
@@ -1223,10 +1317,19 @@ function chooseMonitor(project) {
 
 function buildComponents(project) {
   const items = [];
-  const inv = chooseInverter(project); if (inv) items.push(inv);
-  const ch = chooseCharger(project); if (ch) items.push(ch);
-  const mp = chooseMppt(project); if (mp) items.push(mp);
-  const strat = chooseChargeStrategy(project); if (strat) items.push(strat);
+
+  const inv = chooseInverter(project);
+  if (inv) items.push(inv);
+
+  const ch = chooseCharger(project);
+  if (ch) items.push(ch);
+
+  const mp = chooseMppt(project);
+  if (mp) items.push(mp);
+
+  const strat = chooseChargeStrategy(project);
+  if (strat) items.push(strat);
+
   chooseMonitor(project).forEach(x => items.push(x));
 
   project.dcLoads.forEach(load => {
@@ -1242,8 +1345,7 @@ function buildComponents(project) {
 
   return items;
 }
-
-function priceFor(id) {
+  function priceFor(id) {
   const product = PRODUCT_CATALOG.find(x => x.id === id);
   return product ? product.price : 0;
 }
@@ -1253,6 +1355,248 @@ function unitSell(cost) {
   const discount = customer === "operatore" ? 0.50 : 0.40;
   const listPrice = cost / 0.375;
   return listPrice * (1 - discount);
+}
+
+function generateCableRoutes(project, components) {
+  const routes = [];
+  const inverter = components.find(c => c.type === "inverter" || c.type === "inverter_charger");
+  const charger = components.find(c => c.type === "charger");
+  const mppt = components.find(c => c.type === "mppt");
+  const shunt = components.find(c => c.type === "monitor");
+  const gx = components.find(c => c.type === "gx");
+  const chargeLink = components.find(c => c.type === "battery_link" || c.type === "dc_dc");
+
+  if (inverter) {
+    routes.push({
+      id:"route_inv_batt",
+      from:"Banco servizi",
+      to:inverter.name,
+      type:"dc_power",
+      label:"Banco servizi → Inverter",
+      current: project.general.inverterPower / project.general.systemVoltage,
+      section:null,
+      distance:2,
+      note:"Linea DC principale. Considerare positivo e negativo; verificare percorso tramite SmartShunt se presente."
+    });
+  }
+
+  if (charger) {
+    routes.push({
+      id:"route_ac_charger",
+      from:"Banchina AC",
+      to:charger.name,
+      type:"ac_power",
+      label:"Banchina AC → Caricatore",
+      current:null,
+      section:null,
+      distance:3,
+      note:"Linea AC: sezione e protezioni da verificare secondo normativa e corrente assorbita."
+    });
+
+    routes.push({
+      id:"route_charger_batt",
+      from:charger.name,
+      to:"Banco servizi",
+      type:"dc_power",
+      label:"Caricatore → Banco servizi",
+      current: charger.amp || 20,
+      section:null,
+      distance:2,
+      note:"Linea DC di carica verso banco servizi."
+    });
+  }
+
+  if (mppt) {
+    routes.push({
+      id:"route_pv_mppt",
+      from:"Campo FV",
+      to:mppt.name,
+      type:"pv_dc",
+      label:"Campo FV → MPPT",
+      current:null,
+      section:null,
+      distance:5,
+      note:"Tratta lato pannelli. Dimensionare su corrente stringa e lunghezza reale."
+    });
+
+    routes.push({
+      id:"route_mppt_batt",
+      from:mppt.name,
+      to:"Banco servizi",
+      type:"dc_power",
+      label:"MPPT → Banco servizi",
+      current: mppt.amp || 30,
+      section:null,
+      distance:2,
+      note:"Linea DC dal regolatore al banco batterie."
+    });
+  }
+
+  if (chargeLink && project.alternators.length) {
+    const alt = project.alternators[0];
+
+    routes.push({
+      id:"route_alt_link",
+      from:alt.name,
+      to:chargeLink.name,
+      type:"dc_power",
+      label:"Alternatore → " + chargeLink.name,
+      current: alt.amps || 30,
+      section:null,
+      distance:2,
+      note:"Tratta di carica da alternatore verso dispositivo di gestione carica."
+    });
+
+    routes.push({
+      id:"route_link_batt",
+      from:chargeLink.name,
+      to:"Banco servizi / avviamento",
+      type:"dc_power",
+      label:chargeLink.name + " → Banchi batterie",
+      current: alt.amps || 30,
+      section:null,
+      distance:2,
+      note:"Tratta verso i banchi serviti dalla strategia di carica."
+    });
+  }
+
+  if (shunt) {
+    routes.push({
+      id:"route_shunt_batt",
+      from:"SmartShunt",
+      to:"Banco servizi",
+      type:"dc_negative",
+      label:"SmartShunt → Banco servizi",
+      current:null,
+      section:null,
+      distance:1,
+      note:"Tratta negativa principale; sezione coerente con linea DC principale."
+    });
+  }
+
+  if (gx && shunt) {
+    routes.push({
+      id:"route_gx_shunt",
+      from:"Cerbo GX",
+      to:"SmartShunt",
+      type:"data",
+      label:"Cerbo GX → SmartShunt",
+      current:null,
+      section:"VE.Direct",
+      distance:2,
+      note:"Cavo dati VE.Direct."
+    });
+  }
+
+  if (gx && mppt) {
+    routes.push({
+      id:"route_gx_mppt",
+      from:"Cerbo GX",
+      to:mppt.name,
+      type:"data",
+      label:"Cerbo GX → MPPT",
+      current:null,
+      section:"VE.Direct",
+      distance:2,
+      note:"Cavo dati VE.Direct."
+    });
+  }
+
+  if (gx && inverter && inverter.type === "inverter_charger") {
+    routes.push({
+      id:"route_gx_inverter",
+      from:"Cerbo GX",
+      to:inverter.name,
+      type:"data",
+      label:"Cerbo GX → Inverter/Charger",
+      current:null,
+      section:"VE.Bus",
+      distance:2,
+      note:"Cavo dati VE.Bus / RJ45."
+    });
+  }
+
+  return routes;
+}
+
+function renderCableDistanceInputs(routes) {
+  if (!routes.length) {
+    $("cablingInputCard").classList.add("hidden");
+    $("cablingInput").innerHTML = "";
+    return;
+  }
+
+  $("cablingInputCard").classList.remove("hidden");
+
+  $("cablingInput").innerHTML = routes.map(r => `
+    <div class="route-card">
+      <div class="route-title">${r.label}</div>
+      <div class="grid grid-3">
+        <div>
+          <label>Distanza indicativa (m)</label>
+          <input id="dist_${r.id}" type="number" value="${r.distance || 1}">
+        </div>
+        <div>
+          <label>Tipo tratta</label>
+          <input value="${r.type}" readonly>
+        </div>
+        <div>
+          <label>Nota</label>
+          <input value="${r.note}" readonly>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function calcCableSectionByCurrent(current, voltage, distance, dropPct=3) {
+  if (!current || !voltage || !distance) return null;
+
+  const rho = 0.0175;
+  const maxDrop = voltage * (dropPct / 100);
+  const section = (2 * rho * distance * current) / maxDrop;
+  const std = [1.5,2.5,4,6,10,16,25,35,50,70,95];
+
+  return std.find(s => s >= section) || 95;
+}
+
+function calculateCableRoutes() {
+  if (!state.project || !state.cablingRoutes.length) {
+    alert("Genera prima la configurazione.");
+    return;
+  }
+
+  const voltage = state.project.general.systemVoltage;
+
+  state.cablingRoutes.forEach(r => {
+    r.distance = getNum("dist_" + r.id, r.distance || 1);
+
+    if (r.type === "data") {
+      r.section = r.section || "cavo dati";
+      return;
+    }
+
+    if (r.type === "ac_power") {
+      r.section = "da verificare AC";
+      return;
+    }
+
+    if (r.type === "pv_dc") {
+      r.section = "da definire su Isc/stringa";
+      return;
+    }
+
+    if (r.type === "dc_negative") {
+      r.section = "uguale linea principale";
+      return;
+    }
+
+    r.section = calcCableSectionByCurrent(r.current, voltage, r.distance, 3) + " mm²";
+  });
+
+  renderCabling(state.project, state.cablingRoutes);
+  renderSchema(state.project, state.project.derivedComponents || [], state.cablingRoutes);
+  setStatus("Sezioni cavi calcolate.");
 }
 
 function renderOutput(project, components) {
@@ -1366,76 +1710,46 @@ function renderQuotes(components) {
   `;
 }
 
-function calcCableSection(power, voltage, length) {
-  if (!power || !voltage || !length) return 0;
-  const current = power / voltage;
-  const rho = 0.0175;
-  const drop = voltage * 0.03;
-  const section = (2 * rho * length * current) / drop;
-  const std = [1.5,2.5,4,6,10,16,25,35,50,70];
-  return std.find(s => s >= section) || 70;
-}
-
-function renderCabling(project, components) {
-  const inv = components.find(c => c.type === "inverter" || c.type === "inverter_charger");
-  const ch = components.find(c => c.type === "charger");
-  const mp = components.find(c => c.type === "mppt");
-  const lines = [];
-
-  if (inv) {
-    lines.push({
-      tratta: "Banco servizi → Inverter",
-      sezione: `${calcCableSection(project.general.inverterPower, project.general.systemVoltage, 2)} mm²`,
-      note: "Positivo e negativo coerenti; verificare SmartShunt."
-    });
+function renderCabling(project, routes) {
+  if (!routes.length) {
+    $("cablingTable").innerHTML = '<div class="empty">Nessun cablaggio generato.</div>';
+    return;
   }
 
-  if (ch) {
-    lines.push({
-      tratta: "Banchina AC → Caricatore",
-      sezione: "AC da definire",
-      note: "Protezione adeguata."
-    });
-
-    lines.push({
-      tratta: "Caricatore → Banco servizi",
-      sezione: "6-16 mm²",
-      note: "Da affinare con distanze reali."
-    });
-  }
-
-  if (mp) {
-    lines.push({
-      tratta: "Campo FV → MPPT",
-      sezione: "da definire",
-      note: "Basare su corrente stringa."
-    });
-
-    lines.push({
-      tratta: "MPPT → Banco servizi",
-      sezione: "6-16 mm²",
-      note: "Da affinare con distanze reali."
-    });
-  }
-
-  $("cablingTable").innerHTML = lines.length ? `
+  $("cablingTable").innerHTML = `
     <div class="table-wrap">
       <table>
         <thead>
-          <tr><th>Tratta</th><th>Sezione</th><th>Note</th></tr>
+          <tr>
+            <th>Tratta</th>
+            <th>Tipo</th>
+            <th>Distanza</th>
+            <th>Corrente stimata</th>
+            <th>Sezione / Cavo</th>
+            <th>Note</th>
+          </tr>
         </thead>
         <tbody>
-          ${lines.map(l => `<tr><td>${l.tratta}</td><td>${l.sezione}</td><td>${l.note}</td></tr>`).join("")}
+          ${routes.map(r => `
+            <tr>
+              <td>${r.label}</td>
+              <td>${r.type}</td>
+              <td>${r.distance || "-"} m</td>
+              <td>${r.current ? r.current.toFixed(1) + " A" : "-"}</td>
+              <td>${r.section || "da calcolare"}</td>
+              <td>${r.note}</td>
+            </tr>
+          `).join("")}
         </tbody>
       </table>
     </div>
-  ` : '<div class="empty">Nessun cablaggio base.</div>';
+  `;
 }
 
-function renderSchema(project, components) {
-  const inv = components.find(c => c.type === "inverter" || c.type === "inverter_charger");
-  const ch = components.find(c => c.type === "charger");
-  const mp = components.find(c => c.type === "mppt");
+function renderSchema(project, components, routes=[]) {
+  const inverter = components.find(c => c.type === "inverter" || c.type === "inverter_charger");
+  const charger = components.find(c => c.type === "charger");
+  const mppt = components.find(c => c.type === "mppt");
   const mon = components.find(c => c.type === "monitor");
   const gx = components.find(c => c.type === "gx");
   const link = components.find(c => c.type === "battery_link" || c.type === "dc_dc");
@@ -1443,17 +1757,17 @@ function renderSchema(project, components) {
   $("schemaView").innerHTML = `
     <div class="schema-row">
       ${project.general.hasShore==="yes" ? '<div class="asset-card">Banchina AC</div><div>→</div>' : ''}
-      ${ch ? `<div class="asset-card">${ch.name}</div><div>→</div>` : ''}
+      ${charger ? `<div class="asset-card">${charger.name}</div><div>→</div>` : ''}
       <div class="asset-card">Banco batterie</div>
       ${link ? `<div>↔</div><div class="asset-card">${link.name}</div>` : ''}
-      ${inv ? `<div>→</div><div class="asset-card">${inv.name}</div>` : ''}
+      ${inverter ? `<div>→</div><div class="asset-card">${inverter.name}</div>` : ''}
     </div>
 
-    ${mp ? `
+    ${mppt ? `
       <div class="schema-row">
         <div class="asset-card">Campo FV</div>
         <div>→</div>
-        <div class="asset-card">${mp.name}</div>
+        <div class="asset-card">${mppt.name}</div>
         <div>→</div>
         <div class="asset-card">Banco batterie</div>
       </div>
@@ -1465,6 +1779,13 @@ function renderSchema(project, components) {
         ${gx ? `<div class="asset-card">${gx.name}</div>` : ''}
       </div>
     ` : ''}
+
+    ${routes.length ? `
+      <div class="note-box" style="margin-top:12px;">
+        <b>Tratte riportate:</b><br>
+        ${routes.map(r => `${r.label}: ${r.section || "da calcolare"}`).join("<br>")}
+      </div>
+    ` : ''}
   `;
 }
 
@@ -1474,15 +1795,20 @@ function generate() {
 
     const project = buildProject();
     const components = buildComponents(project);
+    const routes = generateCableRoutes(project, components);
+
+    project.derivedComponents = components;
 
     state.project = project;
+    state.cablingRoutes = routes;
 
     renderOutput(project, components);
     renderQuotes(components);
-    renderCabling(project, components);
-    renderSchema(project, components);
+    renderCableDistanceInputs(routes);
+    renderCabling(project, routes);
+    renderSchema(project, components, routes);
 
-    setStatus("Configurazione generata.");
+    setStatus("Configurazione generata. Inserisci ora le distanze cablaggi e calcola le sezioni.");
   } catch (err) {
     console.error(err);
     setStatus("Errore durante la generazione.");
@@ -1523,12 +1849,12 @@ function saveProject() {
     dcLoads: collectDcLoads()
   };
 
-  localStorage.setItem("victron_v12_stable", JSON.stringify(snapshot));
+  localStorage.setItem("victron_v12_2", JSON.stringify(snapshot));
   setStatus("Progetto salvato.");
 }
 
 function loadProject() {
-  const raw = localStorage.getItem("victron_v12_stable");
+  const raw = localStorage.getItem("victron_v12_2");
   if (!raw) {
     alert("Nessun progetto salvato.");
     return;
@@ -1631,18 +1957,24 @@ function init() {
 
   $("addBatteryBtn").addEventListener("click", () => addBattery());
   $("resetBatteryBtn").addEventListener("click", resetBatteries);
+
   $("addGeneratorBtn").addEventListener("click", addGenerator);
   $("resetGeneratorBtn").addEventListener("click", resetGenerators);
+
   $("addAlternatorBtn").addEventListener("click", addAlternator);
   $("resetAlternatorBtn").addEventListener("click", resetAlternators);
+
   $("addDcLoadBtn").addEventListener("click", addDcLoad);
   $("resetDcLoadBtn").addEventListener("click", resetDcLoads);
+
   $("generateBtn").addEventListener("click", generate);
   $("saveBtn").addEventListener("click", saveProject);
   $("loadBtn").addEventListener("click", loadProject);
   $("pdfBtn").addEventListener("click", exportPdf);
+  $("calcCablesBtn").addEventListener("click", calculateCableRoutes);
 
   $("enablePV").addEventListener("change", togglePv);
+
   $("pv_count").addEventListener("input", () => {
     syncPvSeriesVisibility();
     updatePvSummary();
@@ -1662,7 +1994,9 @@ function init() {
 }
 
 window.addEventListener("DOMContentLoaded", init);
+
 })();
 </script>
+
 </body>
 </html>
