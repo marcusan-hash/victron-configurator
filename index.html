@@ -3,517 +3,207 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Configuratore Victron V15.1 Guided PRO</title>
+<title>V15.2 Configuratore Victron COMPLETE</title>
+
 <style>
-body{font-family:Arial,sans-serif;background:#f3f6f9;margin:0;color:#1f2933}
-header{background:#003b5c;color:white;padding:22px;text-align:center}
-main{max-width:1100px;margin:20px auto;padding:14px}
-.card{background:white;border-radius:14px;padding:20px;margin-bottom:18px;box-shadow:0 4px 14px rgba(0,0,0,.08)}
-label{display:block;margin-top:14px;font-weight:bold}
-select,input{width:100%;padding:11px;margin-top:6px;border-radius:9px;border:1px solid #cbd5e1;font-size:16px}
-button{background:#0077b6;color:white;border:0;padding:12px 18px;border-radius:9px;margin-top:16px;cursor:pointer;font-size:15px}
-button:hover{background:#005f8e}
-.secondary{background:#64748b}.danger{background:#b91c1c}.success{background:#15803d}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
-.hidden{display:none}
-.box{border:1px solid #cbd5e1;background:#f8fafc;border-radius:10px;padding:14px;margin-top:12px}
-.pill{display:inline-block;background:#e0f2fe;color:#075985;border-radius:999px;padding:5px 10px;margin:4px;font-size:13px}
-.warning{background:#fff7ed;border-left:5px solid #f97316;padding:12px;border-radius:8px;margin:10px 0}
-.rec{background:#ecfdf5;border-left:5px solid #16a34a;padding:12px;border-radius:8px;margin:10px 0}
-.err{background:#fef2f2;border-left:5px solid #dc2626;padding:12px;border-radius:8px;margin:10px 0}
-.final{background:#eef2ff;border-left:5px solid #4f46e5;padding:12px;border-radius:8px;margin:10px 0}
-.small{font-size:14px;color:#64748b}
+body{font-family:Arial;background:#f4f6f8;margin:0}
+header{background:#003b5c;color:#fff;padding:20px;text-align:center}
+main{max-width:1100px;margin:20px auto;padding:10px}
+.card{background:#fff;padding:20px;margin-bottom:15px;border-radius:10px}
+select,input{width:100%;padding:10px;margin-top:5px}
+button{padding:10px 15px;margin-top:10px;border:0;border-radius:6px;background:#0077b6;color:#fff;cursor:pointer}
+.item{border:1px solid #ccc;padding:10px;margin-top:10px;border-radius:6px}
+.info{color:#555;font-size:14px;margin-top:5px}
+.final{background:#eef2ff;padding:10px;border-left:4px solid #4f46e5;margin-top:10px}
 </style>
+
 </head>
 
 <body>
+
 <header>
-<h1>Configuratore Victron Nautica / Camper</h1>
-<p>V15.1 Guided PRO — flusso nuovo/esistente, dettagli fonti energia, consigli selezionabili</p>
+<h1>Configuratore Victron V15.2</h1>
 </header>
 
 <main>
 
 <div class="card">
-<h2>1. Percorso configurazione</h2>
+<h2>Configurazione base</h2>
 
-<label>Che tipo di configurazione vuoi fare?</label>
-<select id="mode" onchange="updateFlow()">
-<option value="">Seleziona</option>
-<option value="new_system">Nuovo impianto</option>
-<option value="existing_system">Impianto esistente</option>
+<label>Modalità</label>
+<select id="mode">
+<option value="new">Nuovo impianto</option>
+<option value="existing">Impianto esistente</option>
 </select>
 
-<label>Che tipo di mezzo stai configurando?</label>
-<select id="vehicleType">
-<option value="">Seleziona</option>
-<option value="camper">Camper</option>
-<option value="boat">Barca</option>
-</select>
-</div>
-
-<div class="card">
-<h2 id="energyTitle">2. Fonti energia e richieste</h2>
-<p id="energyIntro" class="small"></p>
-
-<div class="grid">
-<div>
-<label id="shoreLabel">Banchina / rete 230V</label>
-<select id="shorePower" onchange="toggleDetails()">
-<option value="false">No</option>
-<option value="true">Sì</option>
-</select>
-</div>
-
-<div>
-<label id="generatorLabel">Generatore / gruppo elettrogeno</label>
-<select id="generator" onchange="toggleDetails()">
-<option value="false">No</option>
-<option value="true">Sì</option>
-</select>
-</div>
-
-<div>
-<label id="alternatorLabel">Alternatore</label>
-<select id="alternator" onchange="toggleDetails()">
-<option value="false">No</option>
-<option value="true">Sì</option>
-</select>
-</div>
-
-<div>
-<label id="solarLabel">Impianto solare</label>
-<select id="solar" onchange="toggleDetails()">
-<option value="false">No</option>
-<option value="true">Sì</option>
-</select>
-</div>
-
-<div>
-<label>Potenza AC desiderata da inverter</label>
-<select id="desiredInverterPowerW">
-<option value="0">Nessuna</option>
-<option value="500">500W</option>
-<option value="1000">1000W</option>
-<option value="2000">2000W</option>
-<option value="3000">3000W</option>
-<option value="5000">5000W</option>
-</select>
-</div>
-</div>
-
-<div id="shoreDetails" class="box hidden">
-<h3>Dettagli rete AC / banchina</h3>
-<div class="grid">
-<div><label>Tensione AC</label><select id="shoreVoltage"><option value="230">230V</option><option value="110">110V</option></select></div>
-<div><label>Corrente disponibile</label><select id="shoreCurrentA"><option value="6">6A</option><option value="10">10A</option><option value="16">16A</option><option value="32">32A</option><option value="50">50A</option></select></div>
-</div>
-</div>
-
-<div id="generatorDetails" class="box hidden">
-<h3>Dettagli gruppo elettrogeno</h3>
-<div class="grid">
-<div><label>Potenza generatore</label><input id="generatorPowerW" type="number" placeholder="Es. 3000"></div>
-<div><label>Tensione uscita</label><select id="generatorVoltage"><option value="230">230V</option><option value="110">110V</option></select></div>
-</div>
-</div>
-
-<div id="alternatorDetails" class="box hidden">
-<h3>Dettagli alternatore</h3>
-<div class="grid">
-<div><label>Tensione alternatore</label><select id="alternatorVoltage"><option value="12">12V</option><option value="24">24V</option></select></div>
-<div><label>Corrente alternatore</label><input id="alternatorCurrentA" type="number" placeholder="Es. 120"></div>
-<div><label>Vuoi ricaricare il banco servizi da alternatore?</label><select id="chargeFromAlternator"><option value="true">Sì</option><option value="false">No</option></select></div>
-</div>
-</div>
-
-<div id="solarDetails" class="box hidden">
-<h3>Dettagli solare</h3>
-<div class="grid">
-<div><label>Potenza totale pannelli W</label><input id="solarPowerW" type="number" placeholder="Es. 400"></div>
-<div><label>Numero pannelli</label><input id="solarPanelCount" type="number" placeholder="Es. 2"></div>
-<div><label>Voc pannello singolo</label><input id="solarVoc" type="number" placeholder="Es. 40"></div>
-</div>
-</div>
-</div>
-
-<div class="card">
-<h2>3. Banchi batterie</h2>
-
-<div class="grid">
-<div>
-<label>Nome banco</label>
-<input id="bankName" placeholder="Es. Servizi, Motore 1">
-</div>
-
-<div>
-<label>Uso banco</label>
-<select id="bankUsage">
-<option value="services">Servizi</option>
-<option value="starter">Avviamento</option>
-<option value="bow_thruster">Elica di prua / salpa ancora</option>
-<option value="auxiliary">Ausiliario</option>
-</select>
-</div>
-
-<div>
-<label>Origine batteria</label>
-<select id="batterySource" onchange="toggleBatteryInputMode()">
-<option value="victron_catalog">Catalogo Victron</option>
-<option value="manual_existing">Esistente / altro fornitore</option>
-</select>
-</div>
-
-<div id="catalogBlock">
-<label>Batteria Victron</label>
-<select id="victronBatteryId"></select>
-</div>
-
-<div id="manualBlock" class="hidden">
-<label>Tipo batteria</label>
-<select id="chemistry">
-<option value="AGM">AGM</option>
-<option value="GEL">GEL</option>
-<option value="PIOMBO_ACIDO">Piombo acido</option>
-<option value="LITHIUM">Litio</option>
-<option value="UNKNOWN">Non so</option>
-</select>
-
-<label>Tensione singola batteria</label>
-<input id="singleBatteryVoltage" type="number" placeholder="Es. 12">
-
-<label>Capacità singola batteria Ah</label>
-<input id="singleBatteryCapacityAh" type="number" placeholder="Es. 110">
-</div>
-
-<div>
-<label>Numero batterie</label>
-<input id="batteryCount" type="number" placeholder="Es. 4">
-</div>
-
-<div>
-<label>Tensione banco</label>
-<select id="targetVoltage">
+<label>Tensione banco servizi</label>
+<select id="voltage">
 <option value="12">12V</option>
 <option value="24">24V</option>
 <option value="48">48V</option>
 </select>
-</div>
-</div>
 
-<button onclick="addBatteryBank()">Aggiungi banco</button>
-<button class="secondary" onclick="loadDemoExisting()">Demo impianto esistente</button>
-<button class="danger" onclick="resetAll()">Reset</button>
+<label>Potenza inverter richiesta</label>
+<select id="power">
+<option value="0">Nessuna</option>
+<option value="1000">1000W</option>
+<option value="2000">2000W</option>
+<option value="3000">3000W</option>
+</select>
 
-<div id="banksList"></div>
+<label>Alternatore presente</label>
+<select id="alternator">
+<option value="false">No</option>
+<option value="true">Sì</option>
+</select>
+
+<label>Solare presente</label>
+<select id="solar">
+<option value="false">No</option>
+<option value="true">Sì</option>
+</select>
+
+<button onclick="run()">Configura</button>
+
 </div>
 
 <div class="card">
-<h2>4. Configurazione</h2>
-<button class="success" onclick="runConfigurator()">Calcola configurazione</button>
-<div id="output"></div>
+<h2>Lista impianto</h2>
+<div id="impianto"></div>
+</div>
+
+<div class="card">
+<h2>Preventivo cliente</h2>
+<div id="cliente"></div>
+</div>
+
+<div class="card">
+<h2>Lista interna</h2>
+<div id="interno"></div>
+</div>
+
+<div class="card">
+<h2>Schema a blocchi</h2>
+<div id="schema"></div>
 </div>
 
 </main>
 
 <script>
-const victronBatteryCatalog=[
-{id:"agm-12-110",name:"Victron AGM Deep Cycle 12V 110Ah",chemistry:"AGM",voltage:12,capacityAh:110},
-{id:"agm-12-125",name:"Victron AGM Super Cycle 12V 125Ah",chemistry:"AGM",voltage:12,capacityAh:125},
-{id:"gel-12-110",name:"Victron GEL Deep Cycle 12V 110Ah",chemistry:"GEL",voltage:12,capacityAh:110},
-{id:"lifepo4-12-100",name:"Victron Lithium SuperPack 12.8V 100Ah",chemistry:"LITHIUM",voltage:12.8,capacityAh:100},
-{id:"lifepo4-12-200",name:"Victron LiFePO4 Smart 12.8V 200Ah",chemistry:"LITHIUM",voltage:12.8,capacityAh:200}
-];
 
-let batteryBanks=[];
-let recommendations=[];
-let acceptedRecommendations=[];
+// ===== CATALOGO BASE VICRON =====
+const catalog = {
+inverter:[
+{ id:"inv1", name:"Phoenix 12/1200", v:12, p:1200, price:600, info:"Inverter base" },
+{ id:"inv2", name:"Phoenix 24/3000", v:24, p:3000, price:1200, info:"Inverter alta potenza" }
+],
+multiplus:[
+{ id:"mp1", name:"MultiPlus 12/2000", v:12, p:2000, price:1500, info:"Inverter + caricatore" },
+{ id:"mp2", name:"MultiPlus 24/3000", v:24, p:3000, price:2200, info:"Sistema completo AC" }
+],
+mppt:[
+{ id:"mppt1", name:"SmartSolar 100/30", price:300, info:"Regolatore solare" }
+],
+dcdc:[
+{ id:"orion", name:"Orion-Tr Smart 12/24", price:250, info:"Carica da alternatore" }
+],
+monitor:[
+{ id:"shunt", name:"SmartShunt", price:150, info:"Monitor batterie" }
+]
+};
 
-function init(){
-const s=document.getElementById("victronBatteryId");
-victronBatteryCatalog.forEach(b=>{
-const o=document.createElement("option");
-o.value=b.id;
-o.textContent=b.name;
-s.appendChild(o);
+// ===== MOTORE =====
+function run(){
+
+let voltage=parseInt(val("voltage"));
+let power=parseInt(val("power"));
+let alternator=val("alternator")==="true";
+let solar=val("solar")==="true";
+
+let impianto=[];
+let cliente=[];
+let interno=[];
+
+// INVERTER
+if(power>0){
+let inv=catalog.multiplus.find(x=>x.v===voltage && x.p>=power);
+if(!inv) inv=catalog.inverter.find(x=>x.v===voltage);
+
+add(inv);
+}
+
+// ALTERNATORE
+if(alternator){
+add(catalog.dcdc[0]);
+}
+
+// SOLARE
+if(solar){
+add(catalog.mppt[0]);
+}
+
+// MONITOR SEMPRE
+add(catalog.monitor[0]);
+
+function add(p){
+impianto.push(p);
+cliente.push({name:p.name,price:p.price});
+interno.push({name:p.name,note:p.info});
+}
+
+// ===== OUTPUT =====
+renderImpianto(impianto);
+renderCliente(cliente);
+renderInterno(interno);
+renderSchema(impianto);
+
+}
+
+// ===== UI =====
+function renderImpianto(list){
+let html="";
+list.forEach(p=>{
+html+=`
+<div class="item">
+<strong>${p.name}</strong>
+<button onclick="alert('${p.info}')">i</button>
+<div class="info">${p.info}</div>
+</div>`;
 });
-updateFlow();
-toggleBatteryInputMode();
-}
-init();
-
-function updateFlow(){
-const mode=document.getElementById("mode").value;
-const intro=document.getElementById("energyIntro");
-
-if(mode==="new_system"){
-intro.textContent="Nuovo impianto: indica quali fonti vuoi prevedere e quale potenza AC desideri. Il configuratore costruirà la soluzione da zero.";
-document.getElementById("shoreLabel").textContent="Vuoi prevedere banchina / rete 230V?";
-document.getElementById("generatorLabel").textContent="Vuoi prevedere gruppo elettrogeno?";
-document.getElementById("alternatorLabel").textContent="Vuoi ricarica da alternatore?";
-document.getElementById("solarLabel").textContent="Vuoi prevedere pannelli solari?";
-document.getElementById("batterySource").value="victron_catalog";
-}
-else if(mode==="existing_system"){
-intro.textContent="Impianto esistente: indica cosa è già presente a bordo. Ogni elemento selezionato richiederà i dettagli necessari.";
-document.getElementById("shoreLabel").textContent="Banchina / rete 230V già presente?";
-document.getElementById("generatorLabel").textContent="Gruppo elettrogeno già presente?";
-document.getElementById("alternatorLabel").textContent="Alternatore già presente?";
-document.getElementById("solarLabel").textContent="Pannelli solari già presenti?";
-}
-else{
-intro.textContent="";
-}
-toggleBatteryInputMode();
+document.getElementById("impianto").innerHTML=html;
 }
 
-function toggleDetails(){
-show("shoreDetails",val("shorePower")==="true");
-show("generatorDetails",val("generator")==="true");
-show("alternatorDetails",val("alternator")==="true");
-show("solarDetails",val("solar")==="true");
+function renderCliente(list){
+let tot=0;
+let html="<ul>";
+list.forEach(p=>{
+tot+=p.price;
+html+=`<li>${p.name} - €${p.price}</li>`;
+});
+html+=`</ul><strong>TOTALE: €${tot}</strong>`;
+document.getElementById("cliente").innerHTML=html;
 }
 
-function toggleBatteryInputMode(){
-const source=val("batterySource");
-show("catalogBlock",source==="victron_catalog");
-show("manualBlock",source==="manual_existing");
+function renderInterno(list){
+let html="<ul>";
+list.forEach(p=>{
+html+=`<li>${p.name} → ${p.note}</li>`;
+});
+html+="</ul>";
+document.getElementById("interno").innerHTML=html;
 }
 
-function show(id,visible){
-document.getElementById(id).classList.toggle("hidden",!visible);
+function renderSchema(list){
+let html="Batteria → ";
+list.forEach(p=>{
+html+=`→ ${p.name} `;
+});
+document.getElementById("schema").innerHTML="<div class='final'>"+html+"</div>";
 }
 
 function val(id){return document.getElementById(id).value}
 
-function getBattery(id){return victronBatteryCatalog.find(b=>b.id===id)}
-
-function addBatteryBank(){
-let source=val("batterySource");
-let bank={
-name:val("bankName")||"Banco senza nome",
-usage:val("bankUsage"),
-batterySource:source,
-batteryCount:Number(val("batteryCount")),
-targetVoltage:Number(val("targetVoltage"))
-};
-
-if(source==="victron_catalog"){
-const b=getBattery(val("victronBatteryId"));
-bank={...bank,batteryModel:b.name,chemistry:b.chemistry,singleBatteryVoltage:b.voltage,singleBatteryCapacityAh:b.capacityAh};
-}else{
-bank={...bank,chemistry:val("chemistry"),singleBatteryVoltage:Number(val("singleBatteryVoltage")),singleBatteryCapacityAh:Number(val("singleBatteryCapacityAh"))};
-}
-
-if(!bank.batteryCount||!bank.targetVoltage||!bank.singleBatteryVoltage||!bank.singleBatteryCapacityAh){
-alert("Completa i dati del banco batteria.");
-return;
-}
-
-batteryBanks.push(bank);
-renderBanks();
-}
-
-function renderBanks(){
-const c=document.getElementById("banksList");
-c.innerHTML="";
-batteryBanks.forEach((b,i)=>{
-c.innerHTML+=`
-<div class="box">
-<strong>${b.name}</strong><br>
-<span class="pill">${usage(b.usage)}</span>
-<span class="pill">${b.batterySource==="victron_catalog"?"Victron":"Esistente"}</span>
-<p>${b.batteryModel||b.chemistry} — ${b.batteryCount} × ${b.singleBatteryVoltage}V ${b.singleBatteryCapacityAh}Ah — banco ${b.targetVoltage}V</p>
-<button class="danger" onclick="batteryBanks.splice(${i},1);renderBanks()">Rimuovi</button>
-</div>`;
-});
-}
-
-function calcBank(b){
-let errors=[],warnings=[];
-const s=b.targetVoltage/b.singleBatteryVoltage;
-
-if(!Number.isInteger(s))errors.push(`Banco ${b.name}: tensione ${b.targetVoltage}V non ottenibile con batterie da ${b.singleBatteryVoltage}V.`);
-if(Number.isInteger(s)&&b.batteryCount%s!==0)errors.push(`Banco ${b.name}: numero batterie non bilanciato per serie/parallelo.`);
-
-if(errors.length)return{...b,valid:false,errors,warnings};
-
-const p=b.batteryCount/s;
-const ah=b.singleBatteryCapacityAh*p;
-const wh=b.targetVoltage*ah;
-
-if(p>1)warnings.push(`${b.name}: verificare batterie identiche per modello, età e stato.`);
-
-return{
-...b,valid:true,batteriesInSeries:s,parallelStrings:p,
-configuration:`${s}S${p}P`,
-totalVoltage:b.targetVoltage,totalCapacityAh:ah,totalEnergyWh:wh,
-readable:`${b.batteryCount} batterie configurate ${s}S${p}P = ${b.targetVoltage}V ${ah}Ah (${wh}Wh teorici).`,
-errors,warnings
-};
-}
-
-function runConfigurator(){
-acceptedRecommendations=[];
-recommendations=[];
-
-const state={
-mode:val("mode"),
-vehicleType:val("vehicleType"),
-shorePower:val("shorePower")==="true",
-shoreVoltage:Number(val("shoreVoltage")),
-shoreCurrentA:Number(val("shoreCurrentA")),
-generator:val("generator")==="true",
-generatorPowerW:Number(val("generatorPowerW")),
-generatorVoltage:Number(val("generatorVoltage")),
-alternator:val("alternator")==="true",
-alternatorVoltage:Number(val("alternatorVoltage")),
-alternatorCurrentA:Number(val("alternatorCurrentA")),
-chargeFromAlternator:val("chargeFromAlternator")==="true",
-solar:val("solar")==="true",
-solarPowerW:Number(val("solarPowerW")),
-solarPanelCount:Number(val("solarPanelCount")),
-solarVoc:Number(val("solarVoc")),
-desiredInverterPowerW:Number(val("desiredInverterPowerW"))
-};
-
-let errors=[];
-if(!state.mode)errors.push("Seleziona nuovo impianto o impianto esistente.");
-if(!state.vehicleType)errors.push("Seleziona camper o barca.");
-if(!batteryBanks.length)errors.push("Inserisci almeno un banco batterie.");
-
-const banks=batteryBanks.map(calcBank);
-banks.forEach(b=>{if(!b.valid)errors.push(...b.errors)});
-
-const service=banks.find(b=>b.valid&&b.usage==="services");
-
-if(!service)errors.push("Serve almeno un banco servizi per configurare l’impianto.");
-
-if(errors.length){renderOutput(errors,banks,[]);return;}
-
-recommendations.push(rec("battery","Banco servizi rilevato",service.readable,true));
-
-if(state.shorePower){
-recommendations.push(rec("charger","Caricabatterie AC Victron",`Rete ${state.shoreVoltage}V ${state.shoreCurrentA}A disponibile. Serve caricabatterie compatibile con banco ${service.totalVoltage}V.`,true));
-}
-
-if(state.generator){
-if(!state.generatorPowerW)recommendations.push(rec("missing","Dettaglio generatore mancante","Hai indicato generatore presente, ma manca la potenza. Inseriscila per dimensionare correttamente.",false));
-else recommendations.push(rec("generator","Integrazione gruppo elettrogeno",`Gruppo ${state.generatorPowerW}W ${state.generatorVoltage}V: prevedere gestione AC con caricabatterie/inverter-caricabatterie compatibile.`,true));
-}
-
-if(state.alternator&&state.chargeFromAlternator){
-if(!state.alternatorCurrentA)recommendations.push(rec("missing","Dettaglio alternatore mancante","Hai indicato alternatore presente, ma manca la corrente in Ampere.",false));
-else recommendations.push(rec("orion","DC-DC charger Victron Orion-Tr Smart",`Alternatore ${state.alternatorVoltage}V ${state.alternatorCurrentA}A verso banco servizi ${service.totalVoltage}V. Dimensionare DC-DC adeguato.`,true));
-}
-
-if(state.solar){
-if(!state.solarPowerW||!state.solarVoc)recommendations.push(rec("missing","Dettagli solare mancanti","Indica potenza pannelli e Voc per scegliere MPPT.",false));
-else recommendations.push(rec("mppt","Regolatore Victron SmartSolar MPPT",`Campo FV ${state.solarPowerW}W, Voc pannello ${state.solarVoc}V, banco ${service.totalVoltage}V. Selezionare MPPT compatibile.`,true));
-}
-
-if(state.desiredInverterPowerW>0){
-recommendations.push(rec("inverter","Inverter / inverter-caricabatterie Victron",`Potenza AC richiesta ${state.desiredInverterPowerW}W su banco ${service.totalVoltage}V.`,true));
-}
-
-recommendations.push(rec("monitor","Monitoraggio batteria",`Consigliato SmartShunt o BMV sul banco servizi ${service.totalVoltage}V.`,true));
-recommendations.push(rec("protection","Protezioni e sezionatori","Prevedere fusibili, sezionatori e cablaggi dimensionati per ogni tratta.",true));
-
-renderOutput([],banks,recommendations);
-}
-
-function rec(id,title,text,selectable){
-return{id,title,text,selectable,accepted:false};
-}
-
-function toggleRecommendation(i){
-recommendations[i].accepted=!recommendations[i].accepted;
-renderFinalSelection();
-}
-
-function renderOutput(errors,banks,recs){
-const o=document.getElementById("output");
-let h="";
-
-errors.forEach(e=>h+=`<div class="err">${e}</div>`);
-
-if(banks.length){
-h+="<h3>Banchi calcolati</h3>";
-banks.forEach(b=>{
-if(!b.valid)h+=`<div class="err">${b.name}: ${b.errors.join("<br>")}</div>`;
-else h+=`<div class="box"><strong>${b.name}</strong><br><span class="pill">${usage(b.usage)}</span><span class="pill">${b.configuration}</span><p>${b.readable}</p></div>`;
-if(b.warnings)b.warnings.forEach(w=>h+=`<div class="warning">${w}</div>`);
-});
-}
-
-if(recs.length){
-h+="<h3>Consigli selezionabili</h3>";
-recs.forEach((r,i)=>{
-h+=`<div class="rec">
-<strong>${r.title}</strong><br>${r.text}<br>
-${r.selectable?`<button onclick="toggleRecommendation(${i})" id="btnRec${i}">Accetta / rimuovi</button>`:""}
-</div>`;
-});
-h+=`<h3>Proposta impianto selezionata</h3><div id="finalSelection" class="final">Nessun consiglio ancora accettato.</div>`;
-}
-
-o.innerHTML=h;
-renderFinalSelection();
-}
-
-function renderFinalSelection(){
-const box=document.getElementById("finalSelection");
-if(!box)return;
-const accepted=recommendations.filter(r=>r.accepted);
-if(!accepted.length){box.innerHTML="Nessun consiglio ancora accettato.";return;}
-box.innerHTML="<strong>Componenti/azioni accettate:</strong><ul>"+accepted.map(r=>`<li>${r.title}</li>`).join("")+"</ul>";
-}
-
-function loadDemoExisting(){
-document.getElementById("mode").value="existing_system";
-document.getElementById("vehicleType").value="boat";
-updateFlow();
-
-document.getElementById("shorePower").value="true";
-document.getElementById("generator").value="true";
-document.getElementById("alternator").value="true";
-document.getElementById("solar").value="true";
-toggleDetails();
-
-document.getElementById("shoreCurrentA").value="16";
-document.getElementById("generatorPowerW").value="3000";
-document.getElementById("alternatorVoltage").value="12";
-document.getElementById("alternatorCurrentA").value="120";
-document.getElementById("solarPowerW").value="400";
-document.getElementById("solarPanelCount").value="2";
-document.getElementById("solarVoc").value="40";
-document.getElementById("desiredInverterPowerW").value="2000";
-
-batteryBanks=[
-{name:"Motore 1",usage:"starter",batterySource:"manual_existing",chemistry:"AGM",singleBatteryVoltage:12,singleBatteryCapacityAh:95,batteryCount:1,targetVoltage:12},
-{name:"Motore 2",usage:"starter",batterySource:"manual_existing",chemistry:"AGM",singleBatteryVoltage:12,singleBatteryCapacityAh:95,batteryCount:1,targetVoltage:12},
-{name:"Servizi",usage:"services",batterySource:"manual_existing",chemistry:"AGM",singleBatteryVoltage:12,singleBatteryCapacityAh:110,batteryCount:4,targetVoltage:24}
-];
-renderBanks();
-runConfigurator();
-}
-
-function resetAll(){
-batteryBanks=[];
-recommendations=[];
-acceptedRecommendations=[];
-document.getElementById("output").innerHTML="";
-renderBanks();
-}
-
-function usage(u){
-return{
-services:"Servizi",
-starter:"Avviamento",
-bow_thruster:"Elica di prua / salpa ancora",
-auxiliary:"Ausiliario"
-}[u]||u;
-}
 </script>
+
 </body>
 </html>
